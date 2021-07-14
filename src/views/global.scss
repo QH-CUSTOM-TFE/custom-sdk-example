@@ -1,0 +1,18 @@
+@import '~antd/dist/antd.css';
+@import "~@manycore/custom-sdk/index.css";
+
+::-webkit-scrollbar {
+    width: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--color_mask__tertiary);
+}
+
+.ant-divider-horizontal {
+    margin: 10px 0 !important;
+}
+
+.ant-tabs-tabpane {
+    height: 100% !important;
+}
