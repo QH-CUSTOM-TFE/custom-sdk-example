@@ -104,8 +104,9 @@
   },
   "scripts": {
     "start": "cross-env NODE_OPTIONS=--max_old_space_size=8192 react-scripts start",
-    "build": "node scripts/build.js",
-    "test": "node scripts/test.js"
+    "build": "cross-env NODE_OPTIONS=--max_old_space_size=8192 react-scripts build",
+    "test": "cross-env NODE_OPTIONS=--max_old_space_size=8192 react-scripts test",
+    "eject": "cross-env NODE_OPTIONS=--max_old_space_size=8192 react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
