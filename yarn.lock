@@ -1550,18 +1550,17 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
-"@manycore/custom-miniapp-sdk@0.0.5-alpha.3":
-  version "0.0.5-alpha.3"
-  resolved "https://registry.nlark.com/@manycore/custom-miniapp-sdk/download/@manycore/custom-miniapp-sdk-0.0.5-alpha.3.tgz?cache=0&sync_timestamp=1626233450734&other_urls=https%3A%2F%2Fregistry.nlark.com%2F%40manycore%2Fcustom-miniapp-sdk%2Fdownload%2F%40manycore%2Fcustom-miniapp-sdk-0.0.5-alpha.3.tgz#c36fc52009709eeb17c0a72fa62c00f443f3d5ca"
-  integrity sha1-w2/FIAlwnusXwKcvpiwA9EPz1co=
+"@manycore/custom-miniapp-sdk@0.0.7":
+  version "0.0.7"
+  resolved "https://registry.nlark.com/@manycore/custom-miniapp-sdk/download/@manycore/custom-miniapp-sdk-0.0.7.tgz#ef1a0cd44a42ef5b130f13cf987b2b5d5492c319"
+  integrity sha1-7xoM1EpC71sTDxPPmHsrXVSSwxk=
 
-"@manycore/custom-sdk@1.0.0":
-  version "1.0.0"
-  resolved "https://registry.nlark.com/@manycore/custom-sdk/download/@manycore/custom-sdk-1.0.0.tgz#36e729106cf76e6ce50f9820d18dfb268d05bf20"
-  integrity sha1-NucpEGz3bmzlD5gg0Y37Jo0FvyA=
+"@manycore/custom-sdk@1.0.1-alpha.0":
+  version "1.0.1-alpha.0"
+  resolved "https://registry.nlark.com/@manycore/custom-sdk/download/@manycore/custom-sdk-1.0.1-alpha.0.tgz?cache=0&sync_timestamp=1628216041866&other_urls=https%3A%2F%2Fregistry.nlark.com%2F%40manycore%2Fcustom-sdk%2Fdownload%2F%40manycore%2Fcustom-sdk-1.0.1-alpha.0.tgz#83aeb21ee639f1c1df3680853bcbb0613062abd4"
+  integrity sha1-g66yHuY58cHfNoCFO8uwYTBiq9Q=
   dependencies:
-    "@manycore/custom-miniapp-sdk" "0.0.5-alpha.3"
-    eventemitter3 "^4.0.7"
+    "@manycore/custom-miniapp-sdk" "0.0.7"
     servkit "^1.0.11"
 
 "@nodelib/fs.scandir@2.1.5":
@@ -5702,7 +5701,7 @@ eventemitter3@2.0.3:
   resolved "https://registry.nlark.com/eventemitter3/download/eventemitter3-2.0.3.tgz#b5e1079b59fb5e1ba2771c0a993be060a58c99ba"
   integrity sha1-teEHm1n7XhuidxwKmTvgYKWMmbo=
 
-eventemitter3@^4.0.0, eventemitter3@^4.0.7:
+eventemitter3@^4.0.0:
   version "4.0.7"
   resolved "https://registry.nlark.com/eventemitter3/download/eventemitter3-4.0.7.tgz#2de9b68f6528d5644ef5c59526a1b4a07306169f"
   integrity sha1-Lem2j2Uo1WRO9cWVJqG0oHMGFp8=
@@ -12037,10 +12036,17 @@ serve-static@1.14.1:
     parseurl "~1.3.3"
     send "0.17.1"
 
-servkit@^1.0.11, servkit@^1.0.13:
+servkit@^1.0.11:
   version "1.0.13"
   resolved "https://registry.nlark.com/servkit/download/servkit-1.0.13.tgz#2c4d44a78e133ef2fd989877a0968fabe9b55864"
   integrity sha1-LE1Ep44TPvL9mJh3oJaPq+m1WGQ=
+  dependencies:
+    eventemitter3 "2.0.3"
+
+servkit@^1.0.14-alpha.7:
+  version "1.0.14-alpha.7"
+  resolved "https://registry.nlark.com/servkit/download/servkit-1.0.14-alpha.7.tgz#dc8f60afe63b3b0c103ea32b509e114328c0f867"
+  integrity sha1-3I9gr+Y7OwwQPqMrUJ4RQyjA+Gc=
   dependencies:
     eventemitter3 "2.0.3"
 

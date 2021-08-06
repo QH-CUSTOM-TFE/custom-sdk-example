@@ -4,7 +4,11 @@ import { getApplication } from './app';
 export async function bootstrap() {
     const isMiniAppMode = window != window.top;
     if (isMiniAppMode) {
-        await sappSDK.setConfig({}).start();
+        await sappSDK.setConfig({
+            async onClose(sdk) {
+                await getApplication().stop();
+            }
+        }).start();
     }
     const modelViewApp = getApplication();
     await modelViewApp.start();
