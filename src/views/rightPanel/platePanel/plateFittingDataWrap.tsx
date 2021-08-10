@@ -25,6 +25,8 @@ export interface IPlateFittingDataWrapState {
     fittingDesign?: Partial<IFittingDesignData> | null;
 }
 
+const brandGoodId = '3FO4B2O29WOC';
+
 export class PlateFittingDataWrap extends PureComponent<
     IPlateFittingDataWrapProps,
     IPlateFittingDataWrapState
@@ -114,7 +116,7 @@ export class PlateFittingDataWrap extends PureComponent<
                                 z: 1,
                             },
                             fittingType: EFittingType.HARDWARE,
-                            brandGoodId: '3FO4GB757RQ1',
+                            brandGoodId,
                             linkedIds: [grooveId],
                         },
                         {
@@ -135,7 +137,7 @@ export class PlateFittingDataWrap extends PureComponent<
                                 z: 1,
                             },
                             fittingType: EFittingType.HARDWARE,
-                            brandGoodId: '3FO4GB757RQ1',
+                            brandGoodId,
                             linkedIds: [holeId],
                         },
                     ],

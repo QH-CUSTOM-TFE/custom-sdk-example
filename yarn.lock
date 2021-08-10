@@ -1555,10 +1555,10 @@
   resolved "https://registry.nlark.com/@manycore/custom-miniapp-sdk/download/@manycore/custom-miniapp-sdk-0.0.7.tgz#ef1a0cd44a42ef5b130f13cf987b2b5d5492c319"
   integrity sha1-7xoM1EpC71sTDxPPmHsrXVSSwxk=
 
-"@manycore/custom-sdk@1.0.1-alpha.0":
-  version "1.0.1-alpha.0"
-  resolved "https://registry.nlark.com/@manycore/custom-sdk/download/@manycore/custom-sdk-1.0.1-alpha.0.tgz?cache=0&sync_timestamp=1628216041866&other_urls=https%3A%2F%2Fregistry.nlark.com%2F%40manycore%2Fcustom-sdk%2Fdownload%2F%40manycore%2Fcustom-sdk-1.0.1-alpha.0.tgz#83aeb21ee639f1c1df3680853bcbb0613062abd4"
-  integrity sha1-g66yHuY58cHfNoCFO8uwYTBiq9Q=
+"@manycore/custom-sdk@1.0.1-alpha.1":
+  version "1.0.1-alpha.1"
+  resolved "https://registry.nlark.com/@manycore/custom-sdk/download/@manycore/custom-sdk-1.0.1-alpha.1.tgz?cache=0&sync_timestamp=1628599474456&other_urls=https%3A%2F%2Fregistry.nlark.com%2F%40manycore%2Fcustom-sdk%2Fdownload%2F%40manycore%2Fcustom-sdk-1.0.1-alpha.1.tgz#f99b6814913811189e188cbf241fa82c0525ec9a"
+  integrity sha1-+ZtoFJE4ERieGIy/JB+oLAUl7Jo=
   dependencies:
     "@manycore/custom-miniapp-sdk" "0.0.7"
     servkit "^1.0.11"
