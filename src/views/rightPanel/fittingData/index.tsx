@@ -2,7 +2,7 @@ import { IFittingDesignData } from '@manycore/custom-sdk';
 import React, { PureComponent } from 'react';
 import TextArea from 'antd/lib/input/TextArea';
 import Button from 'antd/lib/button';
-import styles from './index.module.scss';
+import style from './index.module.scss';
 import { message } from 'antd';
 
 export interface IFittingDataState {
@@ -98,7 +98,7 @@ export class FittingData extends PureComponent<IRightPanelProps, IFittingDataSta
                     placeholder="Autosize height based on content lines"
                     autoSize={{ minRows: 6, maxRows: 40 }}
                 />
-                <div className={styles.btnContainer}>
+                <div className={style.btnContainer}>
                     {onClear && (
                         <Button type="default" onClick={this.onClear}>
                             清空

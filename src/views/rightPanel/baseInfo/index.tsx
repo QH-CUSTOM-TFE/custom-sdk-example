@@ -18,6 +18,7 @@ import FittingDataWrap from './fittingDataWrap';
 import Checkbox from 'antd/lib/checkbox';
 import { times } from 'lodash';
 import { IExportModelData } from '@manycore/custom-miniapp-sdk';
+import { ModelSwitchWrap } from './modelSwitchWrap';
 
 export interface IBaseInfoState {
     json: string;
@@ -57,10 +58,13 @@ export class BaseInfo extends PureComponent<IBaseInfoProps, IBaseInfoState> {
         plankFaceIds: fullFilled,
     };
 
-    async componentDidMount() {
+    private init = async (mId?: string) => {
         const modelService = getApplication().getService(ModelService);
-        const json = await modelService.getParamData().catch((e) => '');
-        const intersected = await modelService.getParamIntersected().catch((e) => '');
+        const json = await modelService.getParamData({ modelId: mId }).catch((e) => '');
+        const intersected = await modelService
+            .getParamIntersected({ modelId: mId })
+            .catch((e) => '');
+
         this.setState({
             json: json ? JSON.stringify(json) : '',
             intersected: intersected ? JSON.stringify(intersected) : '',
@@ -75,6 +79,10 @@ export class BaseInfo extends PureComponent<IBaseInfoProps, IBaseInfoState> {
         if (fittingResult) {
             this.props.loadFittingDesignSuccess(fittingResult);
         }
+    };
+
+    componentDidMount() {
+        this.init();
     }
 
     /**
@@ -188,12 +196,25 @@ export class BaseInfo extends PureComponent<IBaseInfoProps, IBaseInfoState> {
         );
     };
 
+    /**
+     * 模型切换回调
+     * @param id
+     */
+    handelModelChange = async (id: string) => {
+        this.init(id);
+    };
+
     render() {
         const { fittingDesign } = this.props;
         const { json, intersected, showIntersected } = this.state;
 
         return (
             <div>
+                <div className={styles.descTitle}>
+                    <Icon type="unordered-list" />
+                    <span>模型批量操作</span>
+                </div>
+                <ModelSwitchWrap onChange={this.handelModelChange} />
                 <div className={styles.descTitle}>
                     <Icon type="unordered-list" />
                     <span>模型基础信息</span>
