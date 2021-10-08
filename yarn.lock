@@ -1555,13 +1555,17 @@
   resolved "https://registry.nlark.com/@manycore/custom-miniapp-sdk/download/@manycore/custom-miniapp-sdk-0.0.7.tgz#ef1a0cd44a42ef5b130f13cf987b2b5d5492c319"
   integrity sha1-7xoM1EpC71sTDxPPmHsrXVSSwxk=
 
-"@manycore/custom-sdk@1.0.1-alpha.1":
-  version "1.0.1-alpha.1"
-  resolved "https://registry.nlark.com/@manycore/custom-sdk/download/@manycore/custom-sdk-1.0.1-alpha.1.tgz?cache=0&sync_timestamp=1628599474456&other_urls=https%3A%2F%2Fregistry.nlark.com%2F%40manycore%2Fcustom-sdk%2Fdownload%2F%40manycore%2Fcustom-sdk-1.0.1-alpha.1.tgz#f99b6814913811189e188cbf241fa82c0525ec9a"
-  integrity sha1-+ZtoFJE4ERieGIy/JB+oLAUl7Jo=
+"@manycore/custom-miniapp-sdk@0.4.1":
+  version "0.4.1"
+  resolved "https://registry.npmmirror.com/@manycore/custom-miniapp-sdk/download/@manycore/custom-miniapp-sdk-0.4.1.tgz#cc0dc867e4ae1ea5a115e0044640a5604c2f29b6"
+  integrity sha1-zA3IZ+SuHqWhFeAERkClYEwvKbY=
+
+"@manycore/custom-sdk@1.0.1-alpha.4":
+  version "1.0.1-alpha.4"
+  resolved "https://registry.npmmirror.com/@manycore/custom-sdk/download/@manycore/custom-sdk-1.0.1-alpha.4.tgz?cache=0&sync_timestamp=1632884086970&other_urls=https%3A%2F%2Fregistry.npmmirror.com%2F%40manycore%2Fcustom-sdk%2Fdownload%2F%40manycore%2Fcustom-sdk-1.0.1-alpha.4.tgz#4cc1557e6fca93ad91cf9e88fe7f607c05d41703"
+  integrity sha1-TMFVfm/Kk62Rz56I/n9gfAXUFwM=
   dependencies:
     "@manycore/custom-miniapp-sdk" "0.0.7"
-    servkit "^1.0.11"
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
@@ -12036,17 +12040,10 @@ serve-static@1.14.1:
     parseurl "~1.3.3"
     send "0.17.1"
 
-servkit@^1.0.11:
-  version "1.0.13"
-  resolved "https://registry.nlark.com/servkit/download/servkit-1.0.13.tgz#2c4d44a78e133ef2fd989877a0968fabe9b55864"
-  integrity sha1-LE1Ep44TPvL9mJh3oJaPq+m1WGQ=
-  dependencies:
-    eventemitter3 "2.0.3"
-
-servkit@^1.0.14-alpha.7:
-  version "1.0.14-alpha.7"
-  resolved "https://registry.nlark.com/servkit/download/servkit-1.0.14-alpha.7.tgz#dc8f60afe63b3b0c103ea32b509e114328c0f867"
-  integrity sha1-3I9gr+Y7OwwQPqMrUJ4RQyjA+Gc=
+servkit@^1.0.15:
+  version "1.0.15"
+  resolved "https://registry.npmmirror.com/servkit/download/servkit-1.0.15.tgz#1a852b069bbc3140b688b6bb5c4da77bb2f0308a"
+  integrity sha1-GoUrBpu8MUC2iLa7XE2ne7LwMIo=
   dependencies:
     eventemitter3 "2.0.3"
 

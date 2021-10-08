@@ -1,16 +1,12 @@
-import {
-    EFittingType,
-    FittingDesignService,
-    IFittingDesignData,
-} from '@manycore/custom-sdk';
+import { FittingDesignService, IFittingDesignData } from '@manycore/custom-sdk';
 import React, { PureComponent } from 'react';
 import { getApplication } from '../../../core/app';
 import { actionUpdateSelected } from '../../../store/selection/action';
 import { FittingData } from '../fittingData';
 import { connect } from 'react-redux';
 import Button from 'antd/lib/button';
-import { random } from 'lodash';
 import { IExportModelData } from '@manycore/custom-miniapp-sdk';
+import { mockFittingDesignData } from '../../../util';
 
 const fittingDesignService = getApplication().getService(FittingDesignService);
 const text = '新增';
@@ -24,8 +20,6 @@ export interface IPlateFittingDataWrapProps {
 export interface IPlateFittingDataWrapState {
     fittingDesign?: Partial<IFittingDesignData> | null;
 }
-
-const brandGoodId = '3FO4B2O29WOC';
 
 export class PlateFittingDataWrap extends PureComponent<
     IPlateFittingDataWrapProps,
@@ -49,100 +43,7 @@ export class PlateFittingDataWrap extends PureComponent<
     protected generateRandomValue = (reset: boolean) => {
         return () => {
             const selected = this.props.selected;
-            const holeId = random(1000000000, 10000000000).toString();
-            const grooveId = random(1000000000, 10000000000).toString();
-            let defaultValue: IFittingDesignData = {
-                holes: {
-                    [selected.id]: [
-                        {
-                            id: holeId,
-                            fittingType: EFittingType.HOLE,
-                            params: [],
-                            depth: 20,
-                            diameter: 20,
-                            plankFaceId: 0,
-                            start: {
-                                x: -100,
-                                y: 0,
-                                z: 20,
-                            },
-                            end: {
-                                x: 100,
-                                y: 0,
-                                z: 20,
-                            },
-                        },
-                    ],
-                },
-                grooves: {
-                    [selected.id]: [
-                        {
-                            id: grooveId,
-                            fittingType: EFittingType.GROOVE,
-                            params: [],
-                            depth: 20,
-                            width: 20,
-                            plankFaceId: 0,
-                            start: {
-                                x: 300,
-                                y: 0,
-                                z: 20,
-                            },
-                            end: {
-                                x: 100,
-                                y: 0,
-                                z: 20,
-                            },
-                        },
-                    ],
-                },
-                hardwares: {
-                    [selected.id]: [
-                        {
-                            id: random(1000000000, 10000000000).toString(),
-                            position: {
-                                x: 0,
-                                y: -52,
-                                z: 9,
-                            },
-                            rotate: {
-                                x: 0,
-                                y: 0,
-                                z: 0,
-                            },
-                            scale: {
-                                x: 1,
-                                y: 1,
-                                z: 1,
-                            },
-                            fittingType: EFittingType.HARDWARE,
-                            brandGoodId,
-                            linkedIds: [grooveId],
-                        },
-                        {
-                            id: random(1000000000, 10000000000).toString(),
-                            position: {
-                                x: 0,
-                                y: -448,
-                                z: 9,
-                            },
-                            rotate: {
-                                x: 0,
-                                y: 0,
-                                z: 0,
-                            },
-                            scale: {
-                                x: 1,
-                                y: 1,
-                                z: 1,
-                            },
-                            fittingType: EFittingType.HARDWARE,
-                            brandGoodId,
-                            linkedIds: [holeId],
-                        },
-                    ],
-                },
-            };
+            let defaultValue: IFittingDesignData = mockFittingDesignData({ planeId: selected.id });
             if (reset) {
                 defaultValue = {
                     holes: {
@@ -164,6 +65,7 @@ export class PlateFittingDataWrap extends PureComponent<
 
     protected async getPlatFittingDesign() {
         const { selected } = this.props;
+        debugger
         const result = await fittingDesignService.getConnectedFittingDesign(selected.id);
         this.setState({
             fittingDesign: result,
