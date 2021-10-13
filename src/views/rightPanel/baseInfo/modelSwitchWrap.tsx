@@ -159,7 +159,7 @@ export class ModelSwitchWrap extends PureComponent<IModelSwitchProps, IModelSwit
                 return;
             }
             const paramModel = getSubModels(json.paramModel);
-            let allFittingDesign = { holes: {}, grooves: {}, hardwares: {} };
+            let allFittingDesign = { holes: {}, grooves: {}, hardwares: {}, hardwareGrooves: {} };
             paramModel.map((sm) => {
                 allFittingDesign = mockFittingDesignData({
                     modelId: m,
