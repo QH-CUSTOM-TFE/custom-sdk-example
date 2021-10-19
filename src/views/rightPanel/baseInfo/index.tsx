@@ -41,13 +41,13 @@ export interface IBaseInfoProps {
     loadFittingDesignSuccess(fitting: IFittingDesignData): void;
 }
 
-const availableOptions = times(6, (i) => {
+const availableOptions = times(7, (i) => {
     return {
-        label: i,
+        label: i === 6 ? '空板面' : i,
         value: i,
     };
 });
-const fullFilled = times(6);
+const fullFilled: Array<number> = times(7);
 
 export class BaseInfo extends PureComponent<IBaseInfoProps, IBaseInfoState> {
     state = {
@@ -64,7 +64,6 @@ export class BaseInfo extends PureComponent<IBaseInfoProps, IBaseInfoState> {
         const intersected = await modelService
             .getParamIntersected({ modelId: mId })
             .catch((e) => '');
-
         this.setState({
             json: json ? JSON.stringify(json) : '',
             intersected: intersected ? JSON.stringify(intersected) : '',
@@ -109,7 +108,12 @@ export class BaseInfo extends PureComponent<IBaseInfoProps, IBaseInfoState> {
         lastView = !lastView;
         viewService.toggleModelViewedIntersected({
             references: lastView,
-            plankFaceIds,
+            plankFaceIds: plankFaceIds.map((i) => {
+                if (i === 6) {
+                    return null;
+                }
+                return i;
+            }),
         });
         this.setState({
             lastView,
@@ -124,7 +128,12 @@ export class BaseInfo extends PureComponent<IBaseInfoProps, IBaseInfoState> {
         const viewService = getApplication().getService(IntersectedService);
         viewService.toggleModelViewedIntersected({
             references: lastView,
-            plankFaceIds,
+            plankFaceIds: plankFaceIds.map((i) => {
+                if (i === 6) {
+                    return null;
+                }
+                return i;
+            }),
         });
     };
 

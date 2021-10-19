@@ -55,6 +55,9 @@ export class PlateFittingDataWrap extends PureComponent<
                     hardwares: {
                         [selected.id]: [],
                     },
+                    hardwareGrooves: {
+                        [selected.id]: [],
+                    },
                 };
             }
             this.setState({
@@ -65,7 +68,6 @@ export class PlateFittingDataWrap extends PureComponent<
 
     protected async getPlatFittingDesign() {
         const { selected } = this.props;
-        debugger
         const result = await fittingDesignService.getConnectedFittingDesign(selected.id);
         this.setState({
             fittingDesign: result,

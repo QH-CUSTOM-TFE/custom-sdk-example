@@ -74,6 +74,7 @@ export default connect(
                                   grooves: {},
                                   hardwares: {},
                                   holes: {},
+                                  hardwareGrooves: {},
                               };
 
                     const result: Partial<IAppSelection> = {

@@ -24,6 +24,7 @@ export interface IRightPanelProps<T = IFittingDesignData> {
     onSave?: (value: T) => any;
     // 清空某个方案的模型
     onClear?: () => any;
+    disableSaveBtn?: boolean;
     text: string;
 }
 
@@ -87,7 +88,7 @@ export class FittingData extends PureComponent<IRightPanelProps, IFittingDataSta
     };
 
     render() {
-        const { text, onSave, onClear } = this.props;
+        const { text, onSave, onClear, disableSaveBtn } = this.props;
         const { value } = this.state;
 
         return (
@@ -106,7 +107,7 @@ export class FittingData extends PureComponent<IRightPanelProps, IFittingDataSta
                     )}
                     <span>&nbsp;&nbsp;</span>
                     {onSave && (
-                        <Button onClick={this.onSave} type="primary">
+                        <Button disabled={disableSaveBtn} onClick={this.onSave} type="primary">
                             {text}
                         </Button>
                     )}

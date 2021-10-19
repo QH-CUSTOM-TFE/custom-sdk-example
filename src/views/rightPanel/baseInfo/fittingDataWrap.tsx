@@ -23,6 +23,19 @@ export class FittingDataWrap extends PureComponent<IFittingDataWrapProps, any> {
         message.success('已清空数据!');
     };
 
+    protected disableSaveBtn() {
+        const { fittingDesign } = this.props;
+        return (
+            !fittingDesign ||
+            !Object.keys(fittingDesign)
+                .filter((item) => item !== 'id')
+                .some((key) => {
+                    const v = fittingDesign[key as Exclude<keyof IFittingDesignData, 'id'>];
+                    return !!Object.keys(v).length;
+                })
+        );
+    }
+
     render() {
         const { fittingDesign } = this.props;
 
@@ -30,6 +43,7 @@ export class FittingDataWrap extends PureComponent<IFittingDataWrapProps, any> {
             <FittingData
                 onClear={this.clearFittingData}
                 onSave={this.saveFittingData}
+                disableSaveBtn={this.disableSaveBtn()}
                 text={text}
                 value={fittingDesign}
             />
