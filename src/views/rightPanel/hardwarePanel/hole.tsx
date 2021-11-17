@@ -3,9 +3,9 @@ import React, { PureComponent } from 'react';
 import { Fragment } from 'react';
 import { connect } from 'react-redux';
 import styles from '../index.module.scss';
-import { Icon } from 'antd';
-import { Divider } from 'antd';
-import { Tabs } from 'antd';
+import Icon from 'antd/lib/icon';
+import Divider from 'antd/lib/divider';
+import Tabs from 'antd/lib/tabs';
 import { map } from 'lodash';
 
 const { TabPane } = Tabs;

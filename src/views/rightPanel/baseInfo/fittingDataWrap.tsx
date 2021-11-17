@@ -3,7 +3,7 @@ import { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { getApplication } from '../../../core/app';
 import { FittingData } from '../fittingData';
-import { message } from 'antd';
+import message from 'antd/lib/message';
 
 const text = '保存';
 export interface IFittingDataWrapProps {

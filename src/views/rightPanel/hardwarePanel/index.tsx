@@ -2,10 +2,12 @@ import React, { PureComponent } from 'react';
 import { Fragment } from 'react';
 import { connect } from 'react-redux';
 import styles from '../index.module.scss';
-import { Input, Icon, Tooltip } from 'antd';
+import Input from 'antd/lib/input';
+import Icon from 'antd/lib/icon';
+import Tooltip from 'antd/lib/tooltip';
 import HoleBaseInfo from './hole';
 import GrooveBaseInfo from './groove';
-import { Divider } from 'antd';
+import Divider from 'antd/lib/divider';
 import { IRightPanelProps } from '../';
 
 export class HardwarePanel extends PureComponent<IRightPanelProps, never> {
