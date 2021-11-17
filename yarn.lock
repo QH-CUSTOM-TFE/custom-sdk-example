@@ -1555,10 +1555,10 @@
   resolved "https://registry.npmmirror.com/@manycore/custom-miniapp-sdk/download/@manycore/custom-miniapp-sdk-0.11.1.tgz#e185b3df056a4c9b048f84928ce7adafb65f40d3"
   integrity sha512-SHSlrY6lMeiY5Y5B15x4DJULYQ2VzNZxS9QUEGWwaU5OgTYtBbyTaLInybvGJLe3WEfuE4E4OO9K6kNFMGngjA==
 
-"@manycore/custom-sdk@1.0.1-alpha.10":
-  version "1.0.1-alpha.10"
-  resolved "https://registry.npmmirror.com/@manycore/custom-sdk/download/@manycore/custom-sdk-1.0.1-alpha.10.tgz#021d028e902bc43ccc21ec44d571dba9b6a06820"
-  integrity sha512-SzUnB0oOi9zE5IxVTkTjeM/CCl8TdNBYXpr1SBX5yFgokH2F9TQGQwskCQoNjHU6MfB5MXDUO9t/CgIvnimoZw==
+"@manycore/custom-sdk@1.0.2":
+  version "1.0.2"
+  resolved "https://r.cnpmjs.org/@manycore/custom-sdk/download/@manycore/custom-sdk-1.0.2.tgz#67a95e5e7819ca3ea026d5df7d9ba9279d9093cc"
+  integrity sha512-r3aVrDLE2MhQpLSPTgz4/igrdIS9G6Fh+5hcB/GFo7wpUBYOjuM8OBB5WQAMoRhffU0ogEjHtTIxDHjRa4YEdg==
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"

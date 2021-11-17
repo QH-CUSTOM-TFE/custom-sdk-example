@@ -1,0 +1,11 @@
+.btn-container {
+    display: flex;
+    justify-content: flex-start;
+    flex-flow: wrap;
+
+    :global {
+        .ant-btn {
+            margin: 0 3px 3px 0;
+        }
+    }
+}
