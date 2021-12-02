@@ -4,6 +4,7 @@ import {
     ModelViewerService,
     FittingDesignService,
     ITopParamModelDataResponse,
+    IParamModelPhotoResponse,
 } from '@manycore/custom-sdk';
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
@@ -16,6 +17,7 @@ import Select from 'antd/lib/select';
 import { Fragment } from 'react';
 import Paragraph from 'antd/lib/typography/Paragraph';
 import { getSubModels, mockFittingDesignData } from '../../../util';
+import Avatar from 'antd/lib/avatar';
 
 const { Option } = Select;
 const fittingDesignService = getApplication().getService(FittingDesignService);
@@ -34,6 +36,7 @@ interface IModelSwitchState {
     modelsResult: ITopParamModelDataResponse;
     pageNum: number;
     pageSize: number;
+    selectedModelImgData: IParamModelPhotoResponse[];
 }
 
 export class ModelSwitchWrap extends PureComponent<IModelSwitchProps, IModelSwitchState> {
@@ -52,6 +55,7 @@ export class ModelSwitchWrap extends PureComponent<IModelSwitchProps, IModelSwit
             result: [],
             totalPage: 0,
         },
+        selectedModelImgData: [],
     };
 
     componentDidMount() {
@@ -228,8 +232,26 @@ export class ModelSwitchWrap extends PureComponent<IModelSwitchProps, IModelSwit
         this.getTopModels(page, this.state.pageSize);
     };
 
+    /**
+     * 获取模型缩略图
+     */
+    getModelImg = async () => {
+        const { selectedModelIds } = this.state;
+        const modelService = getApplication().getService(ModelService);
+        const selectedModelImgData = await modelService.getParamModelPhotoById(selectedModelIds);
+        this.setState({ selectedModelImgData });
+    };
+
     render() {
-        const { models, jsons, intersected, fittingData, pageSize, modelsResult } = this.state;
+        const {
+            models,
+            jsons,
+            intersected,
+            fittingData,
+            pageSize,
+            modelsResult,
+            selectedModelImgData,
+        } = this.state;
         return (
             <Fragment>
                 <Divider orientation="left">切换渲染模型</Divider>
@@ -285,7 +307,13 @@ export class ModelSwitchWrap extends PureComponent<IModelSwitchProps, IModelSwit
                 >
                     复制孔槽数据
                 </Paragraph>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <div
+                    style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        marginBottom: '10px',
+                    }}
+                >
                     <Button type="primary" onClick={this.batchGetModelData} size="small">
                         批量获取
                     </Button>
@@ -296,6 +324,15 @@ export class ModelSwitchWrap extends PureComponent<IModelSwitchProps, IModelSwit
                         批量清空
                     </Button>
                 </div>
+                <div>
+                    <Button type="primary" onClick={this.getModelImg} size="small">
+                        获取缩略图
+                    </Button>
+                </div>
+                <p>模型缩略图：</p>
+                {selectedModelImgData.map((i: IParamModelPhotoResponse) => {
+                    return <Avatar shape="square" size={64} alt="No Image" src={i.imgData} />;
+                })}
             </Fragment>
         );
     }

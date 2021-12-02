@@ -1550,15 +1550,15 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
-"@manycore/custom-miniapp-sdk@0.4.1":
-  version "0.4.1"
-  resolved "https://registry.npmmirror.com/@manycore/custom-miniapp-sdk/download/@manycore/custom-miniapp-sdk-0.4.1.tgz#cc0dc867e4ae1ea5a115e0044640a5604c2f29b6"
-  integrity sha1-zA3IZ+SuHqWhFeAERkClYEwvKbY=
+"@manycore/custom-miniapp-sdk@0.11.1":
+  version "0.11.1"
+  resolved "https://registry.npmmirror.com/@manycore/custom-miniapp-sdk/download/@manycore/custom-miniapp-sdk-0.11.1.tgz#e185b3df056a4c9b048f84928ce7adafb65f40d3"
+  integrity sha512-SHSlrY6lMeiY5Y5B15x4DJULYQ2VzNZxS9QUEGWwaU5OgTYtBbyTaLInybvGJLe3WEfuE4E4OO9K6kNFMGngjA==
 
-"@manycore/custom-sdk@1.0.1-alpha.6":
-  version "1.0.1-alpha.6"
-  resolved "https://registry.npmmirror.com/@manycore/custom-sdk/download/@manycore/custom-sdk-1.0.1-alpha.6.tgz?cache=0&sync_timestamp=1634626236004&other_urls=https%3A%2F%2Fregistry.npmmirror.com%2F%40manycore%2Fcustom-sdk%2Fdownload%2F%40manycore%2Fcustom-sdk-1.0.1-alpha.6.tgz#30e50dc00f8110e94fd37df51d92e3ae081b370c"
-  integrity sha1-MOUNwA+BEOlP0331HZLjrggbNww=
+"@manycore/custom-sdk@1.0.3-alpha.0":
+  version "1.0.3-alpha.0"
+  resolved "https://r.cnpmjs.org/@manycore/custom-sdk/download/@manycore/custom-sdk-1.0.3-alpha.0.tgz#f402cb93651cbad2162b9bf219d8a6928c92c334"
+  integrity sha512-0ftyj7Y+Oe62W00OK/D0ZntyEgUbSPMJDiQV/5CuDAWrMWCQU/gngrnHI6NhpVGzjbhmH/G+8Acu4/o1Hd35vg==
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"

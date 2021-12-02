@@ -8,6 +8,7 @@ import BaseInfo from './baseInfo';
 import Tabs from 'antd/lib/tabs';
 import PlateFittingDataWrap from './platePanel/plateFittingDataWrap';
 import { IExportModelData } from '@manycore/custom-miniapp-sdk';
+import { BasicFunction } from './basicFunction';
 
 const { TabPane } = Tabs;
 
@@ -25,6 +26,8 @@ export enum ETabPane {
     MODEL_BASE_INFO = '1',
     // 属性面板
     PROPERTY = '2',
+    // 基础能力
+    BASIC_FUNCTION = '3',
 }
 
 export class RightPanel extends PureComponent<IRightPanelProps, IRightPanelState> {
@@ -76,6 +79,9 @@ export class RightPanel extends PureComponent<IRightPanelProps, IRightPanelState
                         ) : (
                             <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="请选择模型" />
                         )}
+                    </TabPane>
+                    <TabPane tab="API示例" key={ETabPane.BASIC_FUNCTION}>
+                        <BasicFunction />
                     </TabPane>
                 </Tabs>
             </div>

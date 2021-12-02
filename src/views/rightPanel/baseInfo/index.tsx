@@ -17,8 +17,9 @@ import { connect } from 'react-redux';
 import FittingDataWrap from './fittingDataWrap';
 import Checkbox from 'antd/lib/checkbox';
 import { times } from 'lodash';
-import { IExportModelData } from '@manycore/custom-miniapp-sdk';
+import { IExportModelData, IParamModelPhotoResponse } from '@manycore/custom-miniapp-sdk';
 import { ModelSwitchWrap } from './modelSwitchWrap';
+import { Avatar } from 'antd';
 
 export interface IBaseInfoState {
     json: string;
@@ -34,6 +35,10 @@ export interface IBaseInfoState {
     lastView: boolean;
 
     plankFaceIds: number[];
+    /**
+     * 当前选中模型缩略图
+     */
+    modelImgData: IParamModelPhotoResponse[];
 }
 
 export interface IBaseInfoProps {
@@ -56,6 +61,7 @@ export class BaseInfo extends PureComponent<IBaseInfoProps, IBaseInfoState> {
         showIntersected: false,
         lastView: false,
         plankFaceIds: fullFilled,
+        modelImgData: [],
     };
 
     private init = async (mId?: string) => {
@@ -75,6 +81,11 @@ export class BaseInfo extends PureComponent<IBaseInfoProps, IBaseInfoState> {
             undefined,
             false
         );
+        const modelId = json.designData.paramModelIds;
+        const modelImgData = await modelService.getParamModelPhotoById(modelId);
+        this.setState({
+            modelImgData: modelImgData,
+        });
         if (fittingResult) {
             this.props.loadFittingDesignSuccess(fittingResult);
         }
@@ -141,7 +152,7 @@ export class BaseInfo extends PureComponent<IBaseInfoProps, IBaseInfoState> {
      * 模型基础数据渲染
      */
     protected renderModelBaseInfo() {
-        const { json } = this.state;
+        const { json, modelImgData } = this.state;
         if (!json) {
             return null;
         }
@@ -182,6 +193,15 @@ export class BaseInfo extends PureComponent<IBaseInfoProps, IBaseInfoState> {
                         <span>材质</span>
                         <span>{textureName}</span>
                     </div>
+                    <div className={styles.descItem}>
+                        <span>缩略图</span>
+                        <Avatar
+                            shape="square"
+                            size={64}
+                            alt="No Image"
+                            src={this.getImgDataById(modelImgData, id)}
+                        />
+                    </div>
                     <Divider />
                 </>
             );
@@ -211,6 +231,22 @@ export class BaseInfo extends PureComponent<IBaseInfoProps, IBaseInfoState> {
      */
     handelModelChange = async (id: string) => {
         this.init(id);
+    };
+
+    /**
+     * 获取指定模型的缩略图
+     * @param modelImgData
+     * @param id
+     * @returns
+     */
+    private getImgDataById = (modelImgData: IParamModelPhotoResponse[], id: string) => {
+        const modelData: IParamModelPhotoResponse | undefined = modelImgData.find(
+            (m: IParamModelPhotoResponse) => m.modelId === id
+        );
+        if (modelData) {
+            return (modelData as IParamModelPhotoResponse).imgData;
+        }
+        return;
     };
 
     render() {
