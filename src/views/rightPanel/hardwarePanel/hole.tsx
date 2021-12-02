@@ -11,7 +11,7 @@ import { map } from 'lodash';
 const { TabPane } = Tabs;
 
 export interface IHoleBaseInfoProps {
-    selectedFittingDesign?: IFittingDesignData | null;
+    selectedFittingDesign?: IFittingDesignData;
 }
 
 export class HoleBaseInfo extends PureComponent<IHoleBaseInfoProps> {
@@ -79,5 +79,5 @@ export class HoleBaseInfo extends PureComponent<IHoleBaseInfoProps> {
 }
 
 export default connect((state) => ({
-    selectedFittingDesign: state.selection.selectedFittingDesign,
+    selectedFittingDesign: state.selection.selectedFittingDesign!,
 }))(HoleBaseInfo);

@@ -66,7 +66,11 @@ export class BaseInfo extends PureComponent<IBaseInfoProps, IBaseInfoState> {
 
     private init = async (mId?: string) => {
         const modelService = getApplication().getService(ModelService);
-        const json = await modelService.getParamData({ modelId: mId }).catch((e) => '');
+        const json = await modelService.getParamData({ modelId: mId }).catch((e) => {
+            return {
+                designData: []
+            }
+        });
         const intersected = await modelService
             .getParamIntersected({ modelId: mId })
             .catch((e) => '');
@@ -77,10 +81,8 @@ export class BaseInfo extends PureComponent<IBaseInfoProps, IBaseInfoState> {
 
         // 加载孔槽数据
         const fittingDesignService = getApplication().getService(FittingDesignService);
-        const fittingResult = await fittingDesignService.getConnectedFittingDesign(
-            undefined,
-            false
-        );
+        const fittingResult = await fittingDesignService.getFittingDesignData();
+
         const modelId = json.designData.paramModelIds;
         const modelImgData = await modelService.getParamModelPhotoById(modelId);
         this.setState({

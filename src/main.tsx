@@ -1,7 +1,7 @@
+import { once } from 'lodash';
 import React from 'react';
 import ReactDom from 'react-dom';
 import App from './views/App';
-import { once } from 'lodash';
 
 const createRootMountPoint = once(() => {
     const div = document.createElement('div');

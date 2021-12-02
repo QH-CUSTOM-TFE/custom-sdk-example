@@ -1,14 +1,17 @@
+import { Empty } from 'antd';
+import Tabs from 'antd/lib/tabs';
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
-import PlatePanel from './platePanel';
-import HardwarePanel from './hardwarePanel';
-import styles from './index.module.scss';
-import { Empty } from 'antd';
-import BaseInfo from './baseInfo';
-import Tabs from 'antd/lib/tabs';
-import PlateFittingDataWrap from './platePanel/plateFittingDataWrap';
+
 import { IExportModelData } from '@manycore/custom-miniapp-sdk';
+
+import BaseInfo from './baseInfo';
 import { BasicFunction } from './basicFunction';
+import HardwarePanel from './hardwarePanel';
+import HideControl from './hideControl';
+import styles from './index.module.scss';
+import PlatePanel from './platePanel';
+import PlateFittingDataWrap from './platePanel/plateFittingDataWrap';
 
 const { TabPane } = Tabs;
 
@@ -26,6 +29,8 @@ export enum ETabPane {
     MODEL_BASE_INFO = '1',
     // 属性面板
     PROPERTY = '2',
+    // 显示隐藏面板
+    HIDE_CONTROL = '4',
     // 基础能力
     BASIC_FUNCTION = '3',
 }
@@ -82,6 +87,9 @@ export class RightPanel extends PureComponent<IRightPanelProps, IRightPanelState
                     </TabPane>
                     <TabPane tab="API示例" key={ETabPane.BASIC_FUNCTION}>
                         <BasicFunction />
+                    </TabPane>
+                    <TabPane tab="显示/隐藏" key={ETabPane.HIDE_CONTROL}>
+                        <HideControl />
                     </TabPane>
                 </Tabs>
             </div>

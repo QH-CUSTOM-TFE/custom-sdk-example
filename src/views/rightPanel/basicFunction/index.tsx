@@ -16,7 +16,10 @@ import {
     IHintPlank,
     ModelHintService,
     ModelViewerSelectionService,
+    ECameraMoveDirection,
+    ModelCameraService,
 } from '@manycore/custom-sdk';
+import Divider from 'antd/lib/divider';
 
 const { Panel } = Collapse;
 const { Option } = Select;
@@ -126,6 +129,11 @@ export class BasicFunction extends PureComponent<{}, IState> {
         });
     };
 
+    handleMoveCamera = (dir: ECameraMoveDirection) => {
+        const cameraService = getApplication().getService(ModelCameraService);
+        cameraService.moveCamera(dir);
+    };
+
     /**
      * api调用结果显示弹窗
      * @param data
@@ -145,9 +153,10 @@ export class BasicFunction extends PureComponent<{}, IState> {
                 <Collapse defaultActiveKey={['model', 'api']}>
                     <Panel header="模型相关" key="model">
                         <section className={style.btnContainer}>
+                            <Divider>模型自动选中</Divider>
                             <Input.Group compact style={{ paddingBottom: '5px' }}>
                                 <Select
-                                    value={MODEL_TYPE_OPTION[0].value}
+                                    value={this.state.setSelectType}
                                     style={{ width: '35%' }}
                                     onChange={(v: ESetSelectType) => {
                                         this.setState({ setSelectType: v });
@@ -184,10 +193,24 @@ export class BasicFunction extends PureComponent<{}, IState> {
                     </Panel>
                     <Panel header="功能相关" key="api">
                         <section className={style.btnContainer}>
+                            <Divider>房间信息</Divider>
                             {this.commonApiList.map((i) => {
                                 return (
                                     <Button type="primary" onClick={i.onClick()} size="small" ghost>
                                         {i.text}
+                                    </Button>
+                                );
+                            })}
+                            <Divider>相机移动</Divider>
+                            {Object.values(ECameraMoveDirection).map((item) => {
+                                return (
+                                    <Button
+                                        type="primary"
+                                        onClick={() => this.handleMoveCamera(item)}
+                                        size="small"
+                                        ghost
+                                    >
+                                        {item}
                                     </Button>
                                 );
                             })}

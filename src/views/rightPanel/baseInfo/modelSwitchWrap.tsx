@@ -1,18 +1,19 @@
+import { Avatar, Button, Divider, message, Pagination, Select } from 'antd';
+import Paragraph from 'antd/lib/typography/Paragraph';
+import React, { Fragment, PureComponent } from 'react';
+import { connect } from 'react-redux';
+
 import {
-    ModelService,
-    ITopParamModelList,
-    ModelViewerService,
     FittingDesignService,
     ITopParamModelDataResponse,
-    IParamModelPhotoResponse,
+    ITopParamModelList,
+    ModelService,
+    ModelViewerService,
 } from '@manycore/custom-sdk';
-import React, { PureComponent } from 'react';
-import { connect } from 'react-redux';
+
 import { getApplication } from '../../../core/app';
-import { Avatar, Button, Divider, message, Pagination, Select } from 'antd';
-import { Fragment } from 'react';
-import Paragraph from 'antd/lib/typography/Paragraph';
 import { getSubModels, mockFittingDesignData } from '../../../util';
+import { IParamModelPhotoResponse } from '@manycore/custom-miniapp-sdk';
 
 const { Option } = Select;
 const fittingDesignService = getApplication().getService(FittingDesignService);
