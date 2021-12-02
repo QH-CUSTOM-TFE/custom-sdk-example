@@ -3,7 +3,7 @@ import React, { PureComponent } from 'react';
 import TextArea from 'antd/lib/input/TextArea';
 import Button from 'antd/lib/button';
 import style from './index.module.scss';
-import { message } from 'antd';
+import message from 'antd/lib/message';
 
 export interface IFittingDataState {
     value: string;

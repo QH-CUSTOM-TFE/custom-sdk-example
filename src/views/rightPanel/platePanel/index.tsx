@@ -1,6 +1,6 @@
 import { Number3, IExportModelData } from '@manycore/custom-miniapp-sdk';
-import { Divider } from 'antd';
-import { Icon } from 'antd';
+import Divider from 'antd/lib/divider';
+import Icon from 'antd/lib/icon';
 import React, { PureComponent } from 'react';
 import { Fragment } from 'react';
 import { connect } from 'react-redux';

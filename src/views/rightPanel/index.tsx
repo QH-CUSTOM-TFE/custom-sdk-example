@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import PlatePanel from './platePanel';
 import HardwarePanel from './hardwarePanel';
 import styles from './index.module.scss';
-import { Empty } from 'antd';
+import Empty from 'antd/lib/empty';
 import BaseInfo from './baseInfo';
 import Tabs from 'antd/lib/tabs';
 import PlateFittingDataWrap from './platePanel/plateFittingDataWrap';
