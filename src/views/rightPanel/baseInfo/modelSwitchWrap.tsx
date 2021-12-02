@@ -17,6 +17,7 @@ import Select from 'antd/lib/select';
 import { Fragment } from 'react';
 import Paragraph from 'antd/lib/typography/Paragraph';
 import { getSubModels, mockFittingDesignData } from '../../../util';
+import Avatar from 'antd/lib/avatar';
 
 const { Option } = Select;
 const fittingDesignService = getApplication().getService(FittingDesignService);
