@@ -9,7 +9,11 @@ import {
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { getApplication } from '../../../core/app';
-import { Avatar, Button, Divider, message, Pagination, Select } from 'antd';
+import Button from 'antd/lib/button';
+import Divider from 'antd/lib/divider';
+import message from 'antd/lib/message';
+import Pagination from 'antd/lib/pagination';
+import Select from 'antd/lib/select';
 import { Fragment } from 'react';
 import Paragraph from 'antd/lib/typography/Paragraph';
 import { getSubModels, mockFittingDesignData } from '../../../util';
