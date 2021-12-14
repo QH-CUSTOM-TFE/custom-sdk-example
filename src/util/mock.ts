@@ -1,7 +1,9 @@
 import { EFittingType, IFittingDesignData, ELineType, EPointType } from '@manycore/custom-sdk';
 import { random } from 'lodash';
 
-const brandGoodId = '3FO4B2O29WOC';
+// 3FO4GB757RQ1 内网
+// 3FO4B2O29WOC 外网
+const brandGoodId = '3FO4GB757RQ1';
 
 /**
  * 模拟生成孔槽数据

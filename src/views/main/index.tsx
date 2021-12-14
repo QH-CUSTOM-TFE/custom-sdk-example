@@ -1,12 +1,16 @@
+import React, { useEffect } from 'react';
+import { connect } from 'react-redux';
+
 import { IExportModelData } from '@manycore/custom-miniapp-sdk';
 import {
+    ECameraMoveDirection,
     ESelectedType,
     FittingDesignService,
     ISelected,
+    ModelCameraService,
     ModelViewerSelectionService,
 } from '@manycore/custom-sdk';
-import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
+
 import { AppLayout } from '../../components/AppLayout';
 import { getApplication } from '../../core/app';
 import { actionUpdateSelected } from '../../store/selection/action';
@@ -47,6 +51,37 @@ export function Main(props: IMainProps) {
 
         return () => {
             selectService.off(watchSelectedModelChange);
+        };
+    }, []);
+
+    /**注册快捷键 */
+    useEffect(() => {
+        document.onkeydown = function (e: KeyboardEvent) {
+            let arrow: ECameraMoveDirection | undefined = undefined;
+            switch (e.key) {
+                case 'w':
+                    arrow = ECameraMoveDirection.FRONT;
+                    break;
+                case 's':
+                    arrow = ECameraMoveDirection.BACK;
+                    break;
+                case 'a':
+                    arrow = ECameraMoveDirection.LEFT;
+                    break;
+                case 'd':
+                    arrow = ECameraMoveDirection.RIGHT;
+                    break;
+                case 'q':
+                    arrow = ECameraMoveDirection.UP;
+                    break;
+                case 'e':
+                    arrow = ECameraMoveDirection.DOWN;
+                    break;
+            }
+            if (arrow) {
+                const cameraService = getApplication().getService(ModelCameraService);
+                cameraService.moveCamera(arrow);
+            }
         };
     }, []);
 

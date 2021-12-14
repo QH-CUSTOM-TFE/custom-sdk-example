@@ -1,10 +1,9 @@
 import {
-    ModelService,
-    ITopParamModelList,
-    ModelViewerService,
     FittingDesignService,
     ITopParamModelDataResponse,
-    IParamModelPhotoResponse,
+    ITopParamModelList,
+    ModelService,
+    ModelViewerService,
 } from '@manycore/custom-sdk';
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
@@ -18,6 +17,7 @@ import { Fragment } from 'react';
 import Paragraph from 'antd/lib/typography/Paragraph';
 import { getSubModels, mockFittingDesignData } from '../../../util';
 import Avatar from 'antd/lib/avatar';
+import { IParamModelPhotoResponse } from '@manycore/custom-miniapp-sdk';
 
 const { Option } = Select;
 const fittingDesignService = getApplication().getService(FittingDesignService);

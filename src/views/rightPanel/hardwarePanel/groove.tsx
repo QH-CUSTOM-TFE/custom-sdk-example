@@ -11,7 +11,7 @@ import { map } from 'lodash';
 const { TabPane } = Tabs;
 
 export interface IGrooveBaseInfoProps {
-    selectedFittingDesign?: IFittingDesignData | null;
+    selectedFittingDesign?: IFittingDesignData;
 }
 
 export class GrooveBaseInfo extends PureComponent<IGrooveBaseInfoProps> {
@@ -66,7 +66,7 @@ export class GrooveBaseInfo extends PureComponent<IGrooveBaseInfoProps> {
                     <span>关联槽信息</span>
                 </div>
                 <Tabs defaultActiveKey="1" size="small" style={{ height: 200 }}>
-                    {map(selectedFittingDesign!.grooves, (value, id) => (
+                    {map(selectedFittingDesign?.grooves, (value, id) => (
                         <TabPane tab={`槽`} key={id}>
                             {this.renderKongInfo(value, id)}
                         </TabPane>
@@ -79,5 +79,5 @@ export class GrooveBaseInfo extends PureComponent<IGrooveBaseInfoProps> {
 }
 
 export default connect((state) => ({
-    selectedFittingDesign: state.selection.selectedFittingDesign,
+    selectedFittingDesign: state.selection.selectedFittingDesign!,
 }))(GrooveBaseInfo);
