@@ -2,7 +2,6 @@ import { MiniAppDesignFloorPlanService } from '@manycore/custom-miniapp-sdk';
 import React from 'react';
 import { Fragment, PureComponent } from 'react';
 import { connect } from 'react-redux';
-import { sappSDK } from 'servkit';
 import Modal from 'antd/lib/modal';
 import Button from 'antd/lib/button';
 import Collapse from 'antd/lib/collapse';
@@ -66,7 +65,7 @@ export class BasicFunction extends PureComponent<{}, IState> {
      * 获取方案中所有房间列表信息
      */
     private getRoomList = async () => {
-        const floorPlanService = sappSDK.getServiceUnsafe(MiniAppDesignFloorPlanService);
+        const floorPlanService = getApplication().getCustomMiniAppServiceUnSafe(MiniAppDesignFloorPlanService);
         const roomList = await floorPlanService.getDesignRoomList();
         this.showApiResultInfo(roomList);
     };
@@ -75,7 +74,7 @@ export class BasicFunction extends PureComponent<{}, IState> {
      * 获取当前所在房间信息
      */
     private getCurrRoomInfo = async () => {
-        const floorPlanService = sappSDK.getServiceUnsafe(MiniAppDesignFloorPlanService);
+        const floorPlanService = getApplication().getCustomMiniAppServiceUnSafe(MiniAppDesignFloorPlanService);
         const currRoomInfo = await floorPlanService.getDesignSelectedRoom();
         this.showApiResultInfo(currRoomInfo);
     };
