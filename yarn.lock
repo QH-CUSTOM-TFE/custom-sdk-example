@@ -1560,6 +1560,11 @@
   resolved "https://rg.cnpmjs.org/@manycore/custom-sdk/download/@manycore/custom-sdk-1.2.0.tgz#fe1c51abde792f3c0732fc89aa2552f5a6053889"
   integrity sha512-qy1nhfp/G4MPc/ze9Aof0agAtWull0yoZyfkXsOdLJ+ll4f1GwcrnHL7EtTHVEtvWNBRIDG50NDvjeD3MiKiGA==
 
+"@manycore/idp-sdk@1.0.2":
+  version "1.0.2"
+  resolved "https://rg.cnpmjs.org/@manycore/idp-sdk/download/@manycore/idp-sdk-1.0.2.tgz#809327c2abdc110ce25aa94ee248f1902035cbd2"
+  integrity sha512-U+VF/AM9SD6+5E8IuHwBcLNt0hLhsnPOoUnqIed4bqXN3arPlniXPpG3NTDtHFYvVo1KwU7fOaf4jUYrsdREwQ==
+
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
   resolved "https://registry.nlark.com/@nodelib/fs.scandir/download/@nodelib/fs.scandir-2.1.5.tgz?cache=0&sync_timestamp=1622792738877&other_urls=https%3A%2F%2Fregistry.nlark.com%2F%40nodelib%2Ffs.scandir%2Fdownload%2F%40nodelib%2Ffs.scandir-2.1.5.tgz#7619c2eb21b25483f6d167548b4cfd5a7488c3d5"
