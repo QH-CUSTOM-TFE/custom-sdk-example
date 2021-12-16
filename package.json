@@ -107,7 +107,7 @@
   },
   "scripts": {
     "start": "cross-env NODE_OPTIONS=--max_old_space_size=8192 node scripts/start.js",
-    "build": "cross-env NODE_OPTIONS=--max_old_space_size=8192 node scripts/build.js",
+    "build": "cross-env NODE_OPTIONS=--max_old_space_size=8192 PUBLIC_URL=./ node scripts/build.js",
     "test": "cross-env NODE_OPTIONS=--max_old_space_size=8192 node scripts/test.js"
   },
   "eslintConfig": {
