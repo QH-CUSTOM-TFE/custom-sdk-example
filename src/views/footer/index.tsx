@@ -1,6 +1,3 @@
-import Switch from 'antd/lib/switch';
-import { Fragment, useState } from 'react';
-
 import {
     ECameraMode,
     EDesignMode,
@@ -8,12 +5,14 @@ import {
     ModelViewerService,
     SceneService,
 } from '@manycore/custom-sdk';
+import Select from 'antd/es/select';
+import Switch from 'antd/es/switch';
+import { Fragment, useState } from 'react';
 
 import { designModes, RenderModes, sceneCameraMode } from '../../constant';
 import { getApplication } from '../../core/app';
 import { CameraMoveControl } from './CameraMoveControl';
 import style from './index.module.scss';
-import Select from 'antd/lib/select';
 
 const viewerService = getApplication().getService(ModelViewerService);
 const cameraService = getApplication().getService(ModelCameraService);

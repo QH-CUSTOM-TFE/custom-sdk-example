@@ -1,6 +1,3 @@
-import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
-
 import { IExportModelData } from '@manycore/custom-miniapp-sdk';
 import {
     ECameraMoveDirection,
@@ -10,6 +7,8 @@ import {
     ModelCameraService,
     ModelViewerSelectionService,
 } from '@manycore/custom-sdk';
+import React, { useEffect } from 'react';
+import { connect } from 'react-redux';
 
 import { AppLayout } from '../../components/AppLayout';
 import { getApplication } from '../../core/app';
@@ -54,7 +53,7 @@ export function Main(props: IMainProps) {
         };
     }, []);
 
-    /**注册快捷键 */
+    /** 注册快捷键 */
     useEffect(() => {
         document.onkeydown = function (e: KeyboardEvent) {
             let arrow: ECameraMoveDirection | undefined = undefined;
@@ -97,10 +96,11 @@ export default connect(
             actions: {
                 onSelectionChange: async (selected: IExportModelData[]) => {
                     const fittingDesignService = getApplication().getService(FittingDesignService);
+                    const modelId = selected.length ? selected[0].id : undefined;
                     // 获取当前选中的方案数据
-                    const getSelectedFittingDesign = await fittingDesignService.getConnectedFittingDesign(
-                        selected.length ? selected[0].id : undefined
-                    );
+                    const getSelectedFittingDesign = modelId
+                        ? await fittingDesignService.getConnectedFittingDesign(modelId)
+                        : await fittingDesignService.getFittingDesignData(modelId);
 
                     const selectedFittingDesign =
                         getSelectedFittingDesign !== null
@@ -113,8 +113,8 @@ export default connect(
                               };
 
                     const result: Partial<IAppSelection> = {
-                        selected: selected,
-                        selectedFittingDesign: selectedFittingDesign,
+                        selected,
+                        selectedFittingDesign,
                     };
                     dispatch(actionUpdateSelected(result));
                 },

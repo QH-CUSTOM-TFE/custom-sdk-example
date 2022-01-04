@@ -1,12 +1,11 @@
 import { IFittingDesignData, IHoleData } from '@manycore/custom-sdk';
-import React, { PureComponent } from 'react';
-import { Fragment } from 'react';
+import Divider from 'antd/es/divider';
+import Icon from 'antd/es/icon';
+import Tabs from 'antd/es/tabs';
+import { map } from 'lodash';
+import React, { PureComponent, Fragment } from 'react';
 import { connect } from 'react-redux';
 import styles from '../index.module.scss';
-import Icon from 'antd/lib/icon';
-import Divider from 'antd/lib/divider';
-import Tabs from 'antd/lib/tabs';
-import { map } from 'lodash';
 
 const { TabPane } = Tabs;
 
