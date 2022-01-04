@@ -16,7 +16,8 @@ yarn start
 
 当前项目即支持定制小程序，也支持工具小程序启动。
 
-[定制小程序开发者文档](https://manual.kujiale.com/custom-miniapp-sdk/0.11.1#/mini-app/quick-start/accessGuide)
+[定制小程序开发者文档](https://manual.kujiale.com/custom-miniapp-sdk)
+[定制小程序开发者文档](https://manual.kujiale.com/custom-sdk)
 
 如果使用 kaf 小程序启动，可以在浏览器控制台中，执行如下代码添加入口：
 
