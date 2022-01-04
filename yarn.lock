@@ -1550,16 +1550,20 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
-"@manycore/custom-miniapp-sdk@0.11.1":
-  version "0.11.1"
-  resolved "https://registry.npmmirror.com/@manycore/custom-miniapp-sdk/download/@manycore/custom-miniapp-sdk-0.11.1.tgz#e185b3df056a4c9b048f84928ce7adafb65f40d3"
-  integrity sha512-SHSlrY6lMeiY5Y5B15x4DJULYQ2VzNZxS9QUEGWwaU5OgTYtBbyTaLInybvGJLe3WEfuE4E4OO9K6kNFMGngjA==
+"@manycore/custom-miniapp-sdk@0.17.1-alpha.1":
+  version "0.17.1-alpha.1"
+  resolved "https://r2.cnpmjs.org/@manycore/custom-miniapp-sdk/-/custom-miniapp-sdk-0.17.1-alpha.1.tgz#669442320c359e8a20c831271228a3ca49d91dc9"
+  integrity sha512-T9oCPKyh7sdUceSsIjQs5XNZm1qqELR8IGuOQe6nuJA2ylgmOoGPHCSbf+dIVycolwpn9HZeupwvubbJyTCexw==
 
-"@manycore/custom-sdk@1.2.0", "@manycore/custom-sdk@file:./custom-sdk":
-  version "1.4.1-alpha.0"
+"@manycore/custom-sdk@1.8.0-alpha.0":
+  version "1.8.0-alpha.0"
+  resolved "https://r.cnpmjs.org/@manycore/custom-sdk/-/custom-sdk-1.8.0-alpha.0.tgz#eb42154cd72d40f48e4007e89f0aa6bc9f0214f0"
+  integrity sha512-/GLIHF8Rw7iufMBN77OovymHKgeKoD3oGApunnGVqy6yXTMqHJvwCdqDPIBzEpWeXyRY1csee4i3IzxvHKkgiA==
 
-"@manycore/idp-sdk@1.0.2", "@manycore/idp-sdk@file:./idp-sdk":
-  version "1.0.3-yuanlin.0"
+"@manycore/idp-sdk@1.0.2":
+  version "1.0.2"
+  resolved "https://r2.cnpmjs.org/@manycore/idp-sdk/-/idp-sdk-1.0.2.tgz#809327c2abdc110ce25aa94ee248f1902035cbd2"
+  integrity sha512-U+VF/AM9SD6+5E8IuHwBcLNt0hLhsnPOoUnqIed4bqXN3arPlniXPpG3NTDtHFYvVo1KwU7fOaf4jUYrsdREwQ==
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
