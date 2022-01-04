@@ -1,15 +1,16 @@
+import { IExportModelData } from '@manycore/custom-miniapp-sdk';
+import Empty from 'antd/es/empty';
+import Tabs from 'antd/es/tabs';
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
-import PlatePanel from './platePanel';
+
+import BaseInfo from './baseInfo';
+import { BasicFunction } from './basicFunction';
 import HardwarePanel from './hardwarePanel';
 import HideControl from './hideControl';
 import styles from './index.module.scss';
-import Empty from 'antd/lib/empty';
-import BaseInfo from './baseInfo';
-import Tabs from 'antd/lib/tabs';
+import PlatePanel from './platePanel';
 import PlateFittingDataWrap from './platePanel/plateFittingDataWrap';
-import { IExportModelData } from '@manycore/custom-miniapp-sdk';
-import { BasicFunction } from './basicFunction';
 
 const { TabPane } = Tabs;
 

@@ -1,23 +1,24 @@
+import { IParamModelPhotoResponse } from '@manycore/custom-miniapp-sdk';
 import {
     FittingDesignService,
+    IFittingDesignData,
     ITopParamModelDataResponse,
     ITopParamModelList,
     ModelService,
     ModelViewerService,
 } from '@manycore/custom-sdk';
-import React, { PureComponent } from 'react';
+import Avatar from 'antd/es/avatar';
+import Button from 'antd/es/button';
+import Divider from 'antd/es/divider';
+import message from 'antd/es/message';
+import Pagination from 'antd/es/pagination';
+import Select from 'antd/es/select';
+import Paragraph from 'antd/es/typography/Paragraph';
+import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
+
 import { getApplication } from '../../../core/app';
-import Button from 'antd/lib/button';
-import Divider from 'antd/lib/divider';
-import message from 'antd/lib/message';
-import Pagination from 'antd/lib/pagination';
-import Select from 'antd/lib/select';
-import { Fragment } from 'react';
-import Paragraph from 'antd/lib/typography/Paragraph';
 import { getSubModels, mockFittingDesignData } from '../../../util';
-import Avatar from 'antd/lib/avatar';
-import { IParamModelPhotoResponse } from '@manycore/custom-miniapp-sdk';
 
 const { Option } = Select;
 const fittingDesignService = getApplication().getService(FittingDesignService);
@@ -39,8 +40,8 @@ interface IModelSwitchState {
     selectedModelImgData: IParamModelPhotoResponse[];
 }
 
-export class ModelSwitchWrap extends PureComponent<IModelSwitchProps, IModelSwitchState> {
-    state = {
+export class ModelSwitchWrap extends Component<IModelSwitchProps, IModelSwitchState> {
+    state: IModelSwitchState = {
         models: [],
         selectedModelIds: [],
         jsons: '',
@@ -68,9 +69,9 @@ export class ModelSwitchWrap extends PureComponent<IModelSwitchProps, IModelSwit
      * 获取方案中所有顶层模型
      */
     protected getAllTopModelsList = async () => {
-        let num = 1,
-            size = 2,
-            models: ITopParamModelList[] = [];
+        let num = 1;
+        const size = 2;
+        let models: ITopParamModelList[] = [];
         const getModels = async (pageNum: number, pageSize: number) => {
             const modelData = await modelService.getTopParamModels({ pageNum, pageSize });
             models = [...models, ...modelData.result];
@@ -106,7 +107,7 @@ export class ModelSwitchWrap extends PureComponent<IModelSwitchProps, IModelSwit
     /**
      * 批量获取模型数据选择框change回调
      */
-    handleMultipleModelChange = (ids: Array<string>) => {
+    handleMultipleModelChange = (ids: string[]) => {
         this.setState({
             selectedModelIds: ids,
         });
@@ -117,8 +118,8 @@ export class ModelSwitchWrap extends PureComponent<IModelSwitchProps, IModelSwit
      */
     batchGetModelData = async () => {
         const { selectedModelIds } = this.state;
-        let jsonData: Array<any> = [];
-        let intersectedData: Array<any> = [];
+        const jsonData: any[] = [];
+        const intersectedData: any[] = [];
 
         if (!selectedModelIds.length) {
             message.error('请选择模型!');
@@ -156,41 +157,50 @@ export class ModelSwitchWrap extends PureComponent<IModelSwitchProps, IModelSwit
      */
     batchSplit = async () => {
         const { selectedModelIds } = this.state;
-        let fittingDesignData: Array<any> = [];
         if (!selectedModelIds.length) {
             message.error('请选择模型!');
             return;
         }
-        const batchSplitData = selectedModelIds.map(async (m) => {
-            const json = await modelService.getParamData({ modelId: m }).catch((e) => '');
-            if (!json.paramModel.length) {
-                return;
-            }
-            const paramModel = getSubModels(json.paramModel);
-            let allFittingDesign = { holes: {}, grooves: {}, hardwares: {}, hardwareGrooves: {} };
-            paramModel.map((sm) => {
-                allFittingDesign = mockFittingDesignData({
-                    modelId: m,
-                    fittingDesignData: allFittingDesign,
-                    planeId: sm.id,
+        const batchSplitData = await Promise.all(
+            selectedModelIds.map(async (m) => {
+                const json = await modelService.getParamData({ modelId: m }).catch((e) => '');
+                if (!json.paramModel.length) {
+                    return;
+                }
+                const paramModel = getSubModels(json.paramModel);
+                let allFittingDesign: IFittingDesignData = {
+                    id: m,
+                    holes: {},
+                    grooves: {},
+                    hardwares: {},
+                    hardwareGrooves: {},
+                };
+                paramModel.forEach((sm) => {
+                    allFittingDesign = mockFittingDesignData({
+                        modelId: m,
+                        fittingDesignData: allFittingDesign,
+                        planeId: sm.id,
+                    });
                 });
-            });
-            fittingDesignData.push(allFittingDesign);
-            return allFittingDesign;
-        });
-        const data = await Promise.allSettled(batchSplitData);
-        data.map(async (d) => {
-            if (d.status === 'fulfilled') {
-                setTimeout(async () => {
-                    if (d.value) {
-                        fittingDesignService.appendFittingDesign(d.value);
-                    }
-                }, 1000);
-            }
-        });
+                return allFittingDesign;
+            })
+        );
+
+        await Promise.all(
+            batchSplitData.map((it) => {
+                return fittingDesignService.saveDesign(it);
+            })
+        );
+
+        const result = await Promise.all(
+            batchSplitData.map((it) => {
+                return fittingDesignService.getFittingDesignData(it!.id);
+            })
+        );
+
         message.success('批量拆单完成!');
         this.setState({
-            fittingData: fittingDesignData.length ? JSON.stringify(fittingDesignData) : '',
+            fittingData: result.length ? JSON.stringify(result) : '',
         });
     };
 
@@ -237,7 +247,6 @@ export class ModelSwitchWrap extends PureComponent<IModelSwitchProps, IModelSwit
      */
     getModelImg = async () => {
         const { selectedModelIds } = this.state;
-        const modelService = getApplication().getService(ModelService);
         const selectedModelImgData = await modelService.getParamModelPhotoById(selectedModelIds);
         this.setState({ selectedModelImgData });
     };
@@ -260,8 +269,12 @@ export class ModelSwitchWrap extends PureComponent<IModelSwitchProps, IModelSwit
                     style={{ width: 200 }}
                     onChange={this.handleModelChange}
                 >
-                    {modelsResult.result.map((m: ITopParamModelList) => {
-                        return <Option value={m.id}>{m.name}</Option>;
+                    {modelsResult.result.map((m: ITopParamModelList, index) => {
+                        return (
+                            <Option value={m.id} key={index}>
+                                {m.name}
+                            </Option>
+                        );
                     })}
                 </Select>
                 <Paragraph
@@ -288,8 +301,12 @@ export class ModelSwitchWrap extends PureComponent<IModelSwitchProps, IModelSwit
                     allowClear
                     onChange={this.handleMultipleModelChange}
                 >
-                    {models.map((m: ITopParamModelList) => {
-                        return <Option value={m.id}>{m.name}</Option>;
+                    {models.map((m: ITopParamModelList, index) => {
+                        return (
+                            <Option value={m.id} key={index}>
+                                {m.name}
+                            </Option>
+                        );
                     })}
                 </Select>
                 <Paragraph disabled={!!jsons} copyable={jsons ? { text: jsons } : false}>
@@ -330,8 +347,16 @@ export class ModelSwitchWrap extends PureComponent<IModelSwitchProps, IModelSwit
                     </Button>
                 </div>
                 <p>模型缩略图：</p>
-                {selectedModelImgData.map((i: IParamModelPhotoResponse) => {
-                    return <Avatar shape="square" size={64} alt="No Image" src={i.imgData} />;
+                {selectedModelImgData.map((i: IParamModelPhotoResponse, index) => {
+                    return (
+                        <Avatar
+                            shape="square"
+                            size={64}
+                            alt="No Image"
+                            src={i.imgData}
+                            key={index}
+                        />
+                    );
                 })}
             </Fragment>
         );
