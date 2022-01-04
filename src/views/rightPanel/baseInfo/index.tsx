@@ -1,25 +1,25 @@
+import { IExportModelData, IParamModelPhotoResponse } from '@manycore/custom-miniapp-sdk';
 import {
     ModelService,
     IntersectedService,
     FittingDesignService,
     IFittingDesignData,
 } from '@manycore/custom-sdk';
+import Avatar from 'antd/es/avatar';
+import Button from 'antd/es/button/button';
+import Checkbox from 'antd/es/checkbox';
+import Divider from 'antd/es/divider';
+import Icon from 'antd/es/icon';
+import Radio, { RadioChangeEvent } from 'antd/es/radio';
+import Paragraph from 'antd/es/typography/Paragraph';
+import { times } from 'lodash';
 import React, { PureComponent } from 'react';
+import { connect } from 'react-redux';
 import { getApplication } from '../../../core/app';
 import { actionUpdateSelected } from '../../../store/selection/action';
 import styles from '../index.module.scss';
-import Icon from 'antd/lib/icon';
-import Divider from 'antd/lib/divider';
-import Paragraph from 'antd/lib/typography/Paragraph';
-import Radio, { RadioChangeEvent } from 'antd/lib/radio';
-import Button from 'antd/lib/button/button';
-import { connect } from 'react-redux';
 import FittingDataWrap from './fittingDataWrap';
-import Checkbox from 'antd/lib/checkbox';
-import { times } from 'lodash';
-import { IExportModelData, IParamModelPhotoResponse } from '@manycore/custom-miniapp-sdk';
 import { ModelSwitchWrap } from './modelSwitchWrap';
-import { Avatar } from 'antd';
 
 export interface IBaseInfoState {
     json: string;
@@ -52,7 +52,7 @@ const availableOptions = times(7, (i) => {
         value: i,
     };
 });
-const fullFilled: Array<number> = times(7);
+const fullFilled: number[] = times(7);
 
 export class BaseInfo extends PureComponent<IBaseInfoProps, IBaseInfoState> {
     state = {
@@ -66,11 +66,7 @@ export class BaseInfo extends PureComponent<IBaseInfoProps, IBaseInfoState> {
 
     private init = async (mId?: string) => {
         const modelService = getApplication().getService(ModelService);
-        const json = await modelService.getParamData({ modelId: mId }).catch((e) => {
-            return {
-                designData: []
-            }
-        });
+        const json = await modelService.getParamData({ modelId: mId }).catch((e) => '');
         const intersected = await modelService
             .getParamIntersected({ modelId: mId })
             .catch((e) => '');
@@ -81,12 +77,14 @@ export class BaseInfo extends PureComponent<IBaseInfoProps, IBaseInfoState> {
 
         // 加载孔槽数据
         const fittingDesignService = getApplication().getService(FittingDesignService);
-        const fittingResult = await fittingDesignService.getFittingDesignData();
-
+        const fittingResult = await fittingDesignService.getConnectedFittingDesign(
+            undefined,
+            false
+        );
         const modelId = json.designData.paramModelIds;
         const modelImgData = await modelService.getParamModelPhotoById(modelId);
         this.setState({
-            modelImgData: modelImgData,
+            modelImgData,
         });
         if (fittingResult) {
             this.props.loadFittingDesignSuccess(fittingResult);

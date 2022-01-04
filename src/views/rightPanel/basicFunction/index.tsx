@@ -1,24 +1,24 @@
 import { MiniAppDesignFloorPlanService } from '@manycore/custom-miniapp-sdk';
-import React from 'react';
-import { Fragment, PureComponent } from 'react';
-import { connect } from 'react-redux';
-import Modal from 'antd/lib/modal';
-import Button from 'antd/lib/button';
-import Collapse from 'antd/lib/collapse';
-import style from './index.module.scss';
-import { getApplication } from '../../../core/app';
-import Select from 'antd/lib/select';
-import Input from 'antd/lib/input';
 import {
-    ESetSelectType,
+    ECameraMoveDirection,
     ESelectedType,
+    ESetSelectType,
     IHintPlank,
+    ModelCameraService,
     ModelHintService,
     ModelViewerSelectionService,
-    ECameraMoveDirection,
-    ModelCameraService,
+    ModelViewerService,
 } from '@manycore/custom-sdk';
-import Divider from 'antd/lib/divider';
+import Button from 'antd/es/button';
+import Collapse from 'antd/es/collapse';
+import Divider from 'antd/es/divider';
+import Input from 'antd/es/input';
+import Modal from 'antd/es/modal';
+import Select from 'antd/es/select';
+import React, { Fragment, PureComponent } from 'react';
+import { connect } from 'react-redux';
+import { getApplication } from '../../../core/app';
+import style from './index.module.scss';
 
 const { Panel } = Collapse;
 const { Option } = Select;
@@ -65,7 +65,9 @@ export class BasicFunction extends PureComponent<{}, IState> {
      * 获取方案中所有房间列表信息
      */
     private getRoomList = async () => {
-        const floorPlanService = getApplication().getCustomMiniAppServiceUnSafe(MiniAppDesignFloorPlanService);
+        const floorPlanService = getApplication().getCustomMiniAppServiceUnSafe(
+            MiniAppDesignFloorPlanService
+        );
         const roomList = await floorPlanService.getDesignRoomList();
         this.showApiResultInfo(roomList);
     };
@@ -74,7 +76,9 @@ export class BasicFunction extends PureComponent<{}, IState> {
      * 获取当前所在房间信息
      */
     private getCurrRoomInfo = async () => {
-        const floorPlanService = getApplication().getCustomMiniAppServiceUnSafe(MiniAppDesignFloorPlanService);
+        const floorPlanService = getApplication().getCustomMiniAppServiceUnSafe(
+            MiniAppDesignFloorPlanService
+        );
         const currRoomInfo = await floorPlanService.getDesignSelectedRoom();
         this.showApiResultInfo(currRoomInfo);
     };
@@ -144,6 +148,11 @@ export class BasicFunction extends PureComponent<{}, IState> {
             mask: false,
             content: <section>{result ? JSON.stringify(result) : result + ''}</section>,
         });
+    };
+
+    refreshModel = () => {
+        const viewerService = getApplication().getService(ModelViewerService);
+        viewerService.refreshModel();
     };
 
     render() {
@@ -263,6 +272,13 @@ export class BasicFunction extends PureComponent<{}, IState> {
                             </Button>
                             <Button type="primary" onClick={this.hintClear} size="small" ghost>
                                 清空突出展示
+                            </Button>
+                        </section>
+                    </Panel>
+                    <Panel header="模型刷新" key="model">
+                        <section className={style.btnContainer}>
+                            <Button type="primary" onClick={this.refreshModel} size="small" ghost>
+                                刷新模型
                             </Button>
                         </section>
                     </Panel>
