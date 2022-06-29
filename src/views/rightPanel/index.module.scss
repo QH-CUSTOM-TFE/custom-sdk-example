@@ -47,4 +47,21 @@
     :global(.ant-divider) {
         font-size: 12px;
     }
+
+    .imgContainer {
+        position: relative;
+
+        .checkBox {
+            position: absolute;
+            right: 2px;
+            top: 8px;
+        }
+
+        > img {
+            cursor: pointer;
+            width: 200px;
+            height: 200px;
+            margin-top: 10px;
+        }
+    }
 }

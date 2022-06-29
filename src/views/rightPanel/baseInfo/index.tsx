@@ -4,6 +4,11 @@ import {
     IntersectedService,
     FittingDesignService,
     IFittingDesignData,
+    IGetModelIntersectedOption,
+    IParamModelLite,
+    CustomModelService,
+    EIntersectModelType,
+    EProductDirection,
 } from '@manycore/custom-sdk';
 import Avatar from 'antd/es/avatar';
 import Button from 'antd/es/button/button';
@@ -20,6 +25,8 @@ import { actionUpdateSelected } from '../../../store/selection/action';
 import styles from '../index.module.scss';
 import FittingDataWrap from './fittingDataWrap';
 import { ModelSwitchWrap } from './modelSwitchWrap';
+import { InputNumber, Select } from 'antd';
+import { memoize } from 'lodash';
 
 export interface IBaseInfoState {
     json: string;
@@ -39,6 +46,14 @@ export interface IBaseInfoState {
      * 当前选中模型缩略图
      */
     modelImgData: IParamModelPhotoResponse[];
+    /**
+    * 交接面基础配置
+    */
+    intersectedBaseConfig: Omit<IGetModelIntersectedOption, 'modelId'>;
+    /**
+     * 模型数据
+     */
+    modelData?: IParamModelLite;
 }
 
 export interface IBaseInfoProps {
@@ -55,24 +70,38 @@ const availableOptions = times(7, (i) => {
 const fullFilled: number[] = times(7);
 
 export class BaseInfo extends PureComponent<IBaseInfoProps, IBaseInfoState> {
-    state = {
+    state: IBaseInfoState= {
         json: '',
         intersected: '',
         showIntersected: false,
         lastView: false,
         plankFaceIds: fullFilled,
         modelImgData: [],
+        intersectedBaseConfig: {},
+    };
+
+
+    private requestIntersected = async (option: IGetModelIntersectedOption) => {
+        const modelService = getApplication().getService(ModelService);
+        const intersected = await modelService.getParamIntersected({ ...option }).catch((e) => '');
+        this.setState({
+            intersected: intersected ? JSON.stringify(intersected) : '',
+        });
     };
 
     private init = async (mId?: string) => {
+        if (mId) {
+            const customModelService = getApplication().getService(CustomModelService);
+            const model = await customModelService.getCustomModelById(mId);
+            this.setState({
+                modelData: model,
+            });
+        }
         const modelService = getApplication().getService(ModelService);
         const json = await modelService.getParamData({ modelId: mId }).catch((e) => '');
-        const intersected = await modelService
-            .getParamIntersected({ modelId: mId })
-            .catch((e) => '');
+
         this.setState({
             json: json ? JSON.stringify(json) : '',
-            intersected: intersected ? JSON.stringify(intersected) : '',
         });
 
         // 加载孔槽数据
@@ -249,6 +278,248 @@ export class BaseInfo extends PureComponent<IBaseInfoProps, IBaseInfoState> {
         return;
     };
 
+    private mergeIntersectedConfigState = (
+        newConfig: Partial<IBaseInfoState['intersectedBaseConfig']>
+    ) => {
+        this.setState((prevState) => {
+            const { intersectedBaseConfig } = prevState;
+            return {
+                intersectedBaseConfig: {
+                    ...intersectedBaseConfig,
+                    ...newConfig,
+                },
+            };
+        });
+    };
+
+    memGetFlattenModelList = memoize(this.getFlattenModelList);
+
+    private getFlattenModelList(model: IParamModelLite) {
+        const list: IParamModelLite[] = [];
+        const modelQueue = [model];
+        while (modelQueue.length) {
+            const currentModel = modelQueue.shift()!;
+            list.push(currentModel);
+            modelQueue.push(...currentModel.getChild(), ...currentModel.getAccessory());
+        }
+        return list;
+    }
+
+    private getUniqueCategoryList(model: IParamModelLite) {
+        const modelList = this.memGetFlattenModelList(model);
+        return Array.from(new Set(modelList.filter((m) => true).map((m) => m.category)));
+    }
+
+    private getButtonType = (modelType: EIntersectModelType) => {
+        return this.state.intersectedBaseConfig.computeModelTypes?.includes(modelType)
+            ? 'primary'
+            : 'default';
+    };
+
+    private onModelTypeButtonClick = (modelType: EIntersectModelType) => {
+        const computeModelTypes = this.state.intersectedBaseConfig.computeModelTypes || [];
+        const newModelType = [...computeModelTypes];
+        const index = newModelType.indexOf(modelType);
+        if (index > -1) {
+            newModelType.splice(index, 1);
+        } else {
+            newModelType.push(modelType);
+        }
+        return this.mergeIntersectedConfigState({
+            computeModelTypes: newModelType.length ? newModelType : undefined,
+        });
+    };
+
+    private onClickModelDirection = (clickDirection: EProductDirection) => {
+        const {
+            intersectedBaseConfig: { direction },
+        } = this.state;
+        let newDirection: EProductDirection | undefined = clickDirection;
+        if (newDirection === direction) {
+            newDirection = undefined;
+        }
+        this.mergeIntersectedConfigState({ direction: newDirection });
+    };
+
+    private renderIntersectConfig = () => {
+        const {
+            modelData,
+            intersectedBaseConfig: {
+                faceDistTol,
+                bodyDistTol,
+                thicknessFilter,
+                products = [],
+                direction,
+            },
+        } = this.state;
+        const style = { marginBottom: '5px' };
+        return (
+            <>
+                <div className={styles.descTitle}>
+                    <Icon type="unordered-list" />
+                    <span>交接面/体 输入参数</span>
+                </div>
+                <div style={{ fontWeight: 'bold' }}>交接对象配置</div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', margin: '5px' }}>
+                    <Button
+                        size="small"
+                        onClick={() => this.onModelTypeButtonClick(EIntersectModelType.PLANK)}
+                        type={this.getButtonType(EIntersectModelType.PLANK)}
+                    >
+                        板件
+                    </Button>
+                    <Button
+                        size="small"
+                        onClick={() => this.onModelTypeButtonClick(EIntersectModelType.HARDWARE)}
+                        type={this.getButtonType(EIntersectModelType.HARDWARE)}
+                    >
+                        五金
+                    </Button>
+                    <Button
+                        size="small"
+                        onClick={() => this.onModelTypeButtonClick(EIntersectModelType.PRODUCT)}
+                        type={this.getButtonType(EIntersectModelType.PRODUCT)}
+                    >
+                        商品
+                    </Button>
+                </div>
+                <div style={style}>
+                    输入商品真分类:
+                    <InputNumber
+                        size="small"
+                        style={{ width: '50%', marginLeft: '5px' }}
+                        value={products[0] ? products[0].category : undefined}
+                        onChange={(e) =>
+                            this.mergeIntersectedConfigState({
+                                products: e ? [{ category: e }] : undefined,
+                            })
+                        }
+                    />
+                </div>
+                <div>
+                    参与计算商品(多选):
+                    <Select
+                        size="small"
+                        style={{ width: '50%', marginLeft: '5px' }}
+                        mode="multiple"
+                        allowClear
+                        value={products?.map((p) => p.category)}
+                        onChange={(value: number[]) =>
+                            this.mergeIntersectedConfigState({
+                                products: value.length
+                                    ? value.map((v) => ({ category: v }))
+                                    : undefined,
+                            })
+                        }
+                    >
+                        {modelData &&
+                            this.getUniqueCategoryList(modelData).map((category) => (
+                                <Select.Option key={category} value={category}>
+                                    {category}
+                                </Select.Option>
+                            ))}
+                    </Select>
+                </div>
+                <div style={style}>
+                    选择商品建模方向
+                    <div
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            margin: '5px',
+                            flexWrap: 'wrap',
+                        }}
+                    >
+                        <div
+                            className={styles.imgContainer}
+                            onClick={() => this.onClickModelDirection(EProductDirection.XY)}
+                        >
+                            <Checkbox
+                                className={styles.checkBox}
+                                checked={direction === EProductDirection.XY}
+                            />
+                            <img src="https://qhstaticssl.kujiale.com/image/png/1654853270425/F4A5F2E4DFE9C800C630EBA2B371BCBB.png" />
+                        </div>
+                        <div
+                            className={styles.imgContainer}
+                            onClick={() => this.onClickModelDirection(EProductDirection.YZ)}
+                        >
+                            <Checkbox
+                                className={styles.checkBox}
+                                checked={direction === EProductDirection.YZ}
+                            />
+                            <img src="https://qhstaticssl.kujiale.com/image/png/1654853811817/373186B3E0526320E0E074526F014D13.png" />
+                        </div>
+                        <div
+                            className={styles.imgContainer}
+                            onClick={() => this.onClickModelDirection(EProductDirection.XZ)}
+                        >
+                            <Checkbox
+                                className={styles.checkBox}
+                                checked={direction === EProductDirection.XZ}
+                            />
+                            <img src="https://qhstaticssl.kujiale.com/image/png/1654853790413/A0B6281548E5BD6DE5FF9E84B103A395.png" />
+                        </div>
+                    </div>
+                </div>
+
+                <div style={{ fontWeight: 'bold', ...style }}>判断逻辑配置</div>
+                <div style={style}>
+                    不足板厚的交接面是否输出
+                    <Radio.Group
+                        onChange={(v) =>
+                            this.mergeIntersectedConfigState({ thicknessFilter: v.target.value })
+                        }
+                        value={thicknessFilter}
+                    >
+                        <Radio value={true}>否</Radio>
+                        <Radio value={false}>是</Radio>
+                    </Radio.Group>
+                </div>
+                <div style={{ fontWeight: 'bold', ...style }}>计算阈值配置</div>
+                <div style={style}>
+                    交接面阈值(mm):
+                    <InputNumber
+                        size="small"
+                        placeholder="0.1mm"
+                        step={0.1}
+                        min={0}
+                        value={faceDistTol}
+                        onChange={(e) =>
+                            this.mergeIntersectedConfigState({ faceDistTol: e ? e : undefined })
+                        }
+                    />
+                </div>
+                <div style={style}>
+                    交接体阈值(mm):
+                    <InputNumber
+                        size="small"
+                        placeholder="0.1mm"
+                        step={0.1}
+                        min={0}
+                        value={bodyDistTol}
+                        onChange={(e) =>
+                            this.mergeIntersectedConfigState({ bodyDistTol: e ? e : undefined })
+                        }
+                    />
+                </div>
+                <Button
+                    type="primary"
+                    size="small"
+                    onClick={() =>
+                        this.requestIntersected({
+                            ...this.state.intersectedBaseConfig,
+                            modelId: modelData?.id,
+                        })
+                    }
+                >
+                    计算交接体/面
+                </Button>
+                <Divider />
+            </>
+        );
+    };
+
     render() {
         const { fittingDesign } = this.props;
         const { json, intersected, showIntersected } = this.state;
@@ -265,6 +536,7 @@ export class BaseInfo extends PureComponent<IBaseInfoProps, IBaseInfoState> {
                     <span>模型基础信息</span>
                 </div>
                 {this.renderModelBaseInfo()}
+                {this.renderIntersectConfig()}
                 <div>
                     <Paragraph disabled={!!json} copyable={json ? { text: json } : false}>
                         复制JSON数据
