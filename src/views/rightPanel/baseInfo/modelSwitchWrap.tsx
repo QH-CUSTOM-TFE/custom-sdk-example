@@ -1,24 +1,19 @@
-import { IParamModelPhotoResponse } from '@manycore/custom-miniapp-sdk';
+import { Avatar, Button, Divider, message, Pagination, Select, Input } from 'antd';
+import Paragraph from 'antd/lib/typography/Paragraph';
+import React, { Fragment, PureComponent } from 'react';
+import { connect } from 'react-redux';
+
 import {
     FittingDesignService,
-    IFittingDesignData,
     ITopParamModelDataResponse,
     ITopParamModelList,
     ModelService,
     ModelViewerService,
 } from '@manycore/custom-sdk';
-import Avatar from 'antd/es/avatar';
-import Button from 'antd/es/button';
-import Divider from 'antd/es/divider';
-import message from 'antd/es/message';
-import Pagination from 'antd/es/pagination';
-import Select from 'antd/es/select';
-import Paragraph from 'antd/es/typography/Paragraph';
-import React, { Component, Fragment } from 'react';
-import { connect } from 'react-redux';
 
 import { getApplication } from '../../../core/app';
 import { getSubModels, mockFittingDesignData } from '../../../util';
+import { IParamModelPhotoResponse } from '@manycore/custom-miniapp-sdk';
 
 const { Option } = Select;
 const fittingDesignService = getApplication().getService(FittingDesignService);
@@ -38,17 +33,18 @@ interface IModelSwitchState {
     pageNum: number;
     pageSize: number;
     selectedModelImgData: IParamModelPhotoResponse[];
+    templateID:string;
 }
 
-export class ModelSwitchWrap extends Component<IModelSwitchProps, IModelSwitchState> {
-    state: IModelSwitchState = {
+export class ModelSwitchWrap extends PureComponent<IModelSwitchProps, IModelSwitchState> {
+    state = {
         models: [],
         selectedModelIds: [],
         jsons: '',
         intersected: '',
         fittingData: '',
         pageNum: 1,
-        pageSize: 2,
+        pageSize: 5,
         modelsResult: {
             count: 0,
             currPage: 0,
@@ -57,6 +53,7 @@ export class ModelSwitchWrap extends Component<IModelSwitchProps, IModelSwitchSt
             totalPage: 0,
         },
         selectedModelImgData: [],
+        templateID:'',
     };
 
     componentDidMount() {
@@ -69,9 +66,9 @@ export class ModelSwitchWrap extends Component<IModelSwitchProps, IModelSwitchSt
      * 获取方案中所有顶层模型
      */
     protected getAllTopModelsList = async () => {
-        let num = 1;
-        const size = 2;
-        let models: ITopParamModelList[] = [];
+        let num = 1,
+            size = 2,
+            models: ITopParamModelList[] = [];
         const getModels = async (pageNum: number, pageSize: number) => {
             const modelData = await modelService.getTopParamModels({ pageNum, pageSize });
             models = [...models, ...modelData.result];
@@ -88,7 +85,9 @@ export class ModelSwitchWrap extends Component<IModelSwitchProps, IModelSwitchSt
     };
 
     private getTopModels = async (pageNum: number, pageSize: number) => {
-        const modelData = await modelService.getTopParamModels({ pageNum, pageSize });
+        const modelData = await modelService.getTopParamModels({ pageNum, pageSize
+            // ,ignoreCategory: 533
+        });
         this.setState({
             modelsResult: modelData,
         });
@@ -100,6 +99,9 @@ export class ModelSwitchWrap extends Component<IModelSwitchProps, IModelSwitchSt
      */
     handleModelChange = async (id: string) => {
         const modelViewerService = getApplication().getService(ModelViewerService);
+        // modelViewerService.setting({
+        //     renderIgnoreCategory: 459 // 或传多个id：[ 173 ]
+        // });
         await modelViewerService.viewModelById(id);
         this.props.onChange(id);
     };
@@ -107,7 +109,7 @@ export class ModelSwitchWrap extends Component<IModelSwitchProps, IModelSwitchSt
     /**
      * 批量获取模型数据选择框change回调
      */
-    handleMultipleModelChange = (ids: string[]) => {
+    handleMultipleModelChange = (ids: Array<string>) => {
         this.setState({
             selectedModelIds: ids,
         });
@@ -118,15 +120,17 @@ export class ModelSwitchWrap extends Component<IModelSwitchProps, IModelSwitchSt
      */
     batchGetModelData = async () => {
         const { selectedModelIds } = this.state;
-        const jsonData: any[] = [];
-        const intersectedData: any[] = [];
+        let jsonData: Array<any> = [];
+        let intersectedData: Array<any> = [];
 
         if (!selectedModelIds.length) {
             message.error('请选择模型!');
             return;
         }
         const modelsInfo = selectedModelIds.map(async (sm, idx) => {
-            const json = await modelService.getParamData({ modelId: sm }).catch((e) => '');
+            const json = await modelService.getParamData({ modelId: sm,
+                force:true,
+                templateId:this.state.templateID ? this.state.templateID:undefined }).catch((e) => '');
             const intersected = await modelService
                 .getParamIntersected({ modelId: sm })
                 .catch((e) => '');
@@ -157,50 +161,41 @@ export class ModelSwitchWrap extends Component<IModelSwitchProps, IModelSwitchSt
      */
     batchSplit = async () => {
         const { selectedModelIds } = this.state;
+        let fittingDesignData: Array<any> = [];
         if (!selectedModelIds.length) {
             message.error('请选择模型!');
             return;
         }
-        const batchSplitData = await Promise.all(
-            selectedModelIds.map(async (m) => {
-                const json = await modelService.getParamData({ modelId: m }).catch((e) => '');
-                if (!json.paramModel.length) {
-                    return;
-                }
-                const paramModel = getSubModels(json.paramModel);
-                let allFittingDesign: IFittingDesignData = {
-                    id: m,
-                    holes: {},
-                    grooves: {},
-                    hardwares: {},
-                    hardwareGrooves: {},
-                };
-                paramModel.forEach((sm) => {
-                    allFittingDesign = mockFittingDesignData({
-                        modelId: m,
-                        fittingDesignData: allFittingDesign,
-                        planeId: sm.id,
-                    });
+        const batchSplitData = selectedModelIds.map(async (m) => {
+            const json = await modelService.getParamData({ modelId: m }).catch((e) => '');
+            if (!json.paramModel.length) {
+                return;
+            }
+            const paramModel = getSubModels(json.paramModel);
+            let allFittingDesign = { holes: {}, grooves: {}, hardwares: {}, hardwareGrooves: {} };
+            paramModel.map((sm) => {
+                allFittingDesign = mockFittingDesignData({
+                    modelId: m,
+                    fittingDesignData: allFittingDesign,
+                    planeId: sm.id,
                 });
-                return allFittingDesign;
-            })
-        );
-
-        await Promise.all(
-            batchSplitData.map((it) => {
-                return fittingDesignService.saveDesign(it);
-            })
-        );
-
-        const result = await Promise.all(
-            batchSplitData.map((it) => {
-                return fittingDesignService.getFittingDesignData(it!.id);
-            })
-        );
-
+            });
+            fittingDesignData.push(allFittingDesign);
+            return allFittingDesign;
+        });
+        const data = await Promise.allSettled(batchSplitData);
+        data.map(async (d) => {
+            if (d.status === 'fulfilled') {
+                setTimeout(async () => {
+                    if (d.value) {
+                        fittingDesignService.appendFittingDesign(d.value);
+                    }
+                }, 1000);
+            }
+        });
         message.success('批量拆单完成!');
         this.setState({
-            fittingData: result.length ? JSON.stringify(result) : '',
+            fittingData: fittingDesignData.length ? JSON.stringify(fittingDesignData) : '',
         });
     };
 
@@ -247,6 +242,7 @@ export class ModelSwitchWrap extends Component<IModelSwitchProps, IModelSwitchSt
      */
     getModelImg = async () => {
         const { selectedModelIds } = this.state;
+        const modelService = getApplication().getService(ModelService);
         const selectedModelImgData = await modelService.getParamModelPhotoById(selectedModelIds);
         this.setState({ selectedModelImgData });
     };
@@ -269,12 +265,8 @@ export class ModelSwitchWrap extends Component<IModelSwitchProps, IModelSwitchSt
                     style={{ width: 200 }}
                     onChange={this.handleModelChange}
                 >
-                    {modelsResult.result.map((m: ITopParamModelList, index) => {
-                        return (
-                            <Option value={m.id} key={index}>
-                                {m.name}
-                            </Option>
-                        );
+                    {modelsResult.result.map((m: ITopParamModelList) => {
+                        return <Option value={m.id}>{m.name}</Option>;
                     })}
                 </Select>
                 <Paragraph
@@ -301,12 +293,8 @@ export class ModelSwitchWrap extends Component<IModelSwitchProps, IModelSwitchSt
                     allowClear
                     onChange={this.handleMultipleModelChange}
                 >
-                    {models.map((m: ITopParamModelList, index) => {
-                        return (
-                            <Option value={m.id} key={index}>
-                                {m.name}
-                            </Option>
-                        );
+                    {models.map((m: ITopParamModelList) => {
+                        return <Option value={m.id}>{m.name}</Option>;
                     })}
                 </Select>
                 <Paragraph disabled={!!jsons} copyable={jsons ? { text: jsons } : false}>
@@ -324,6 +312,18 @@ export class ModelSwitchWrap extends Component<IModelSwitchProps, IModelSwitchSt
                 >
                     复制孔槽数据
                 </Paragraph>
+                <div style={{ marginBottom: '5px' }}>
+                    批量获取的模板id:
+                    <Input
+                        size="small"
+                        style={{ width: '50%', marginLeft: '5px' }}
+                        placeholder="null"
+                        value={ this.state.templateID }
+                        onChange={(evt) => {
+                            this.setState({templateID: evt.target.value.trim()});
+                        }}
+                    />
+                </div>
                 <div
                     style={{
                         display: 'flex',
@@ -347,16 +347,8 @@ export class ModelSwitchWrap extends Component<IModelSwitchProps, IModelSwitchSt
                     </Button>
                 </div>
                 <p>模型缩略图：</p>
-                {selectedModelImgData.map((i: IParamModelPhotoResponse, index) => {
-                    return (
-                        <Avatar
-                            shape="square"
-                            size={64}
-                            alt="No Image"
-                            src={i.imgData}
-                            key={index}
-                        />
-                    );
+                {selectedModelImgData.map((i: IParamModelPhotoResponse) => {
+                    return <Avatar shape="square" size={64} alt="No Image" src={i.imgData} />;
                 })}
             </Fragment>
         );

@@ -1,11 +1,12 @@
 import { Number3, IExportModelData } from '@manycore/custom-miniapp-sdk';
-import Divider from 'antd/es/divider';
-import Icon from 'antd/es/icon';
-import Paragraph from 'antd/es/typography/Paragraph';
-import React, { PureComponent, Fragment } from 'react';
+import { Divider } from 'antd';
+import { Icon } from 'antd';
+import React, { PureComponent } from 'react';
+import { Fragment } from 'react';
 import { connect } from 'react-redux';
 import { IRightPanelProps } from '../';
 import styles from '../index.module.scss';
+import Paragraph from 'antd/lib/typography/Paragraph';
 
 export class PlatePanel extends PureComponent<IRightPanelProps, never> {
     // 基本属性

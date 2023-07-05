@@ -1,9 +1,9 @@
 import { IFittingDesignData } from '@manycore/custom-sdk';
-import Button from 'antd/es/button';
-import TextArea from 'antd/es/input/TextArea';
-import message from 'antd/es/message';
 import React, { PureComponent } from 'react';
+import TextArea from 'antd/lib/input/TextArea';
+import Button from 'antd/lib/button';
 import style from './index.module.scss';
+import { message } from 'antd';
 
 export interface IFittingDataState {
     value: string;

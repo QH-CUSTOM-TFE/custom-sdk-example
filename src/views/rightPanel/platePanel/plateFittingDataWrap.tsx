@@ -4,7 +4,7 @@ import { getApplication } from '../../../core/app';
 import { actionUpdateSelected } from '../../../store/selection/action';
 import { FittingData } from '../fittingData';
 import { connect } from 'react-redux';
-import Button from 'antd/es/button';
+import Button from 'antd/lib/button';
 import { IExportModelData } from '@manycore/custom-miniapp-sdk';
 import { mockFittingDesignData } from '../../../util';
 

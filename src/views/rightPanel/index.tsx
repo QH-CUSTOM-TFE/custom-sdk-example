@@ -1,13 +1,15 @@
-import { IExportModelData } from '@manycore/custom-miniapp-sdk';
-import Empty from 'antd/es/empty';
-import Tabs from 'antd/es/tabs';
+import { Empty } from 'antd';
+import Tabs from 'antd/lib/tabs';
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
+
+import { IExportModelData } from '@manycore/custom-miniapp-sdk';
 
 import BaseInfo from './baseInfo';
 import { BasicFunction } from './basicFunction';
 import HardwarePanel from './hardwarePanel';
 import HideControl from './hideControl';
+import SpecialLabel from './specialLabel'
 import styles from './index.module.scss';
 import PlatePanel from './platePanel';
 import PlateFittingDataWrap from './platePanel/plateFittingDataWrap';
@@ -32,6 +34,8 @@ export enum ETabPane {
     HIDE_CONTROL = '4',
     // 基础能力
     BASIC_FUNCTION = '3',
+    // 孔槽特殊标识
+    SPECIAL_LABEL = '5',
 }
 
 export class RightPanel extends PureComponent<IRightPanelProps, IRightPanelState> {
@@ -89,6 +93,9 @@ export class RightPanel extends PureComponent<IRightPanelProps, IRightPanelState
                     </TabPane>
                     <TabPane tab="显示/隐藏" key={ETabPane.HIDE_CONTROL}>
                         <HideControl />
+                    </TabPane>
+                    <TabPane tab="孔槽交互示例" key={ETabPane.SPECIAL_LABEL}>
+                        <SpecialLabel />
                     </TabPane>
                 </Tabs>
             </div>

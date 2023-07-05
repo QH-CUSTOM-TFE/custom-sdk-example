@@ -1,24 +1,25 @@
-import { MiniAppDesignFloorPlanService } from '@manycore/custom-miniapp-sdk';
+import {IExportModelData, MiniAppDesignFloorPlanService} from '@manycore/custom-miniapp-sdk';
+import React from 'react';
+import { Fragment, PureComponent } from 'react';
+import { connect } from 'react-redux';
+import Modal from 'antd/lib/modal';
+import Button from 'antd/lib/button';
+import Collapse from 'antd/lib/collapse';
+import style from './index.module.scss';
+import { getApplication } from '../../../core/app';
+import Select from 'antd/lib/select';
+import Input from 'antd/lib/input';
 import {
-    ECameraMoveDirection,
-    ESelectedType,
     ESetSelectType,
+    ESelectedType,
     IHintPlank,
-    ModelCameraService,
     ModelHintService,
     ModelViewerSelectionService,
-    ModelViewerService,
+    ECameraMoveDirection,
+    ModelCameraService, ModelViewerService,
+    PlankPathService,
 } from '@manycore/custom-sdk';
-import Button from 'antd/es/button';
-import Collapse from 'antd/es/collapse';
-import Divider from 'antd/es/divider';
-import Input from 'antd/es/input';
-import Modal from 'antd/es/modal';
-import Select from 'antd/es/select';
-import React, { Fragment, PureComponent } from 'react';
-import { connect } from 'react-redux';
-import { getApplication } from '../../../core/app';
-import style from './index.module.scss';
+import Divider from 'antd/lib/divider';
 
 const { Panel } = Collapse;
 const { Option } = Select;
@@ -38,6 +39,20 @@ interface IState {
     modelIdValue: string;
     setSelectType: ESetSelectType;
 }
+
+let displayPlankAreaCash; //存储实际展示的轮廓数据，用于高亮一键清除
+const colors = [
+    '#ff0000',
+    '#ff8400',
+    '#fff200',
+    '#2ba801',
+    '#00ffa6',
+    '#00ffff',
+    '#0053ff',
+    '#5900ff',
+    '#bc00ff',
+    '#ff0084'
+    ]
 
 export class BasicFunction extends PureComponent<{}, IState> {
     state = {
@@ -65,9 +80,7 @@ export class BasicFunction extends PureComponent<{}, IState> {
      * 获取方案中所有房间列表信息
      */
     private getRoomList = async () => {
-        const floorPlanService = getApplication().getCustomMiniAppServiceUnSafe(
-            MiniAppDesignFloorPlanService
-        );
+        const floorPlanService = getApplication().getCustomMiniAppServiceUnSafe(MiniAppDesignFloorPlanService);
         const roomList = await floorPlanService.getDesignRoomList();
         this.showApiResultInfo(roomList);
     };
@@ -76,9 +89,7 @@ export class BasicFunction extends PureComponent<{}, IState> {
      * 获取当前所在房间信息
      */
     private getCurrRoomInfo = async () => {
-        const floorPlanService = getApplication().getCustomMiniAppServiceUnSafe(
-            MiniAppDesignFloorPlanService
-        );
+        const floorPlanService = getApplication().getCustomMiniAppServiceUnSafe(MiniAppDesignFloorPlanService);
         const currRoomInfo = await floorPlanService.getDesignSelectedRoom();
         this.showApiResultInfo(currRoomInfo);
     };
@@ -95,6 +106,88 @@ export class BasicFunction extends PureComponent<{}, IState> {
                 });
             }
         };
+    };
+
+    /**
+     * 异形板件标识
+     */
+    private hintPlankModel = () => {
+        const selectionService = getApplication().getService(ModelViewerSelectionService);
+        const plankPathService = getApplication().getService(PlankPathService);
+        return async () => {
+            this.hintPlankClear(); // 清除上一次高亮，否则颜色会不断叠加
+            const selected = selectionService.getSelected();
+            if (selected && selected.type === ESelectedType.MODEL) {
+                // #1.获取鼠标选中模型的json数据，取出轮廓数据和板件ID
+                const jsonData = selected.data[0];
+                const {modelId, plankPathData} = this.getPlankDataFromJson(jsonData);
+                // #2.解析轮廓原始数据
+                // modelID传顶层模型or其他非底层模型的id，最后都没有高亮效果
+                const plankArea = plankPathService.parseModelPlankPath({
+                    modelID: modelId,
+                    data: plankPathData,
+                });
+                // #3.对轮廓原始数据进行计算，生成实际展示的轮廓数据 (原始数据中可能存在板件外轮廓和挖洞重合、挖洞与挖洞重合、非直角端点等情况)
+                const displayPlankArea = plankArea.getRealPaths(); //@param force? 忽略缓存
+                displayPlankAreaCash = displayPlankArea; // 记录当前高亮的数据，用于高亮清除
+                console.log('plankArea.getRealPaths()',displayPlankArea);
+                // #4.为轮廓下的所有点、线添加高亮配置
+                displayPlankArea.paths.forEach((d) => {
+                    // if (d.type === EPlankPathType.INNER) {  // 加了这个约束，可以实现仅高亮内部or外部洞
+                        d.points.forEach((p, index) => {
+                            p.setHint({
+                                color: '#d5d5d5',
+                                opacity: 1.0,
+                            });
+                        });
+                        d.lines.forEach((l, index) => {
+                            l.setHint({
+                                color: colors[index % 10],
+                                opacity: 1.0,
+                            });
+                        });
+                    // }
+                });
+                // #5.将修改后的轮廓数据保存到渲染场景中
+                plankPathService.syncModelPlankPath(displayPlankArea);
+            }
+        };
+    };
+    /**
+     * 获取json数据中的板件id、轮廓数据
+     */
+    private getPlankDataFromJson = (jsonData) => {
+        // 板件是模型树的最后一级 没有children，所以需要不断的往下找subModels，直到当前层级没有subModels这个字段
+        let plankModelData = jsonData;
+        while(plankModelData.subModels){
+            plankModelData = plankModelData.subModels[0];
+        }
+        // console.log('plankModel.paramPlankPath',plankModelData.paramPlankPath);
+        return {
+            modelId: plankModelData.id,
+            plankPathData: {
+                path:plankModelData.paramPlankPath.path,
+                holes: plankModelData.paramPlankPath.holes
+            }};
+    };
+    /**
+     * 清空异形板面高亮
+     */
+    private hintPlankClear = () => {
+        const plankPathService = getApplication().getService(PlankPathService);
+        if(displayPlankAreaCash && displayPlankAreaCash.paths) {
+            displayPlankAreaCash.paths.forEach((d) => {
+                d.points.forEach((p) => {
+                    p.clearHint();
+                });
+                d.lines.forEach((l) => {
+                    l.clearHint();
+                });
+            });
+            // 将修改后的轮廓数据保存到渲染场景中
+            plankPathService.syncModelPlankPath(displayPlankAreaCash);
+        }
+        displayPlankAreaCash = null;
     };
 
     private hintClear = () => {
@@ -137,6 +230,11 @@ export class BasicFunction extends PureComponent<{}, IState> {
         cameraService.moveCamera(dir);
     };
 
+    refreshModel = () => {
+        const viewerService = getApplication().getService(ModelViewerService);
+        viewerService.refreshModel();
+    };
+
     /**
      * api调用结果显示弹窗
      * @param data
@@ -148,11 +246,6 @@ export class BasicFunction extends PureComponent<{}, IState> {
             mask: false,
             content: <section>{result ? JSON.stringify(result) : result + ''}</section>,
         });
-    };
-
-    refreshModel = () => {
-        const viewerService = getApplication().getService(ModelViewerService);
-        viewerService.refreshModel();
     };
 
     render() {
@@ -226,20 +319,65 @@ export class BasicFunction extends PureComponent<{}, IState> {
                     </Panel>
                     <Panel header="选中-高亮相关" key="model">
                         <section className={style.btnContainer}>
-                            <Button
-                                type="primary"
-                                onClick={this.hintSelectModel({
-                                    hintOutline: true,
-                                    hintPlankFace: [
-                                        {
+                            <Button type="primary"
+                                    onClick={this.hintSelectModel({
+                                        hintOutline: true,
+                                        hintPlankFace: [{
                                             plankFaceId: 0,
-                                        },
-                                    ],
-                                })}
-                                size="small"
-                                ghost
-                            >
-                                突出板面0
+                                            color: '#8b5fe2',
+                                            opacity: 0.6,
+                                        }],})}
+                                    size="small" ghost > 突出板面0
+                            </Button>
+                            <Button type="primary"
+                                    onClick={this.hintSelectModel({
+                                        hintOutline: true,
+                                        hintPlankFace: [{
+                                            plankFaceId: 1,
+                                            color: '#d5ff18',
+                                            opacity: 0.6,
+                                        }],})}
+                                    size="small" ghost > 突出板面1
+                            </Button>
+                            <Button type="primary"
+                                    onClick={this.hintSelectModel({
+                                        hintOutline: true,
+                                        hintPlankFace: [{
+                                            plankFaceId: 2,
+                                            color: '#db4a03',
+                                            opacity: 0.6,
+                                        }],})}
+                                    size="small" ghost > 突出板面2
+                            </Button>
+                            <Button type="primary"
+                                    onClick={this.hintSelectModel({
+                                        hintOutline: true,
+                                        hintPlankFace: [{
+                                            plankFaceId: 3,
+                                            color: '#27ff18',
+                                            opacity: 0.6,
+                                        }],})}
+                                    size="small" ghost > 突出板面3
+                            </Button>
+                            <Button type="primary"
+                                    onClick={this.hintSelectModel({
+                                        hintOutline: true,
+                                        hintPlankFace: [{
+                                            plankFaceId: [4],
+                                            color: '#07e7e0',
+                                            opacity: 0.6,
+                                        }],})}
+                                    size="small" ghost > 突出板面4
+                            </Button>
+                            <Button type="primary"
+                                    onClick={this.hintSelectModel({
+                                        hintOutline: true,
+                                        hintPlankFace: [{
+                                            plankFaceId: [5],
+                                            color: '#1852ff',
+                                            opacity: 0.6,
+                                        }],})}
+                                    size="small" ghost > 突出板面5
                             </Button>
                             <Button
                                 type="primary"
@@ -247,35 +385,62 @@ export class BasicFunction extends PureComponent<{}, IState> {
                                     hintPlankFace: [
                                         {
                                             plankFaceId: 0,
+                                            color: '#8b5fe2',
+                                            opacity: 0.6,
                                         },
                                         {
                                             plankFaceId: 1,
                                             color: '#d5ff18',
-                                            opacity: 0.4,
+                                            opacity: 0.6,
                                         },
                                         {
                                             plankFaceId: 2,
-                                            color: '#ff6918',
-                                            opacity: 0.4,
+                                            color: '#db4a03',
+                                            opacity: 0.6,
                                         },
                                         {
-                                            plankFaceId: [4, 5],
-                                            color: '#18ff46',
-                                            opacity: 0.4,
+                                            plankFaceId: 3,
+                                            color: '#27ff18',
+                                            opacity: 0.6,
+                                        },
+                                        {
+                                            plankFaceId: [4],
+                                            color: '#07e7e0',
+                                            opacity: 0.6,
+                                        },
+                                        {
+                                            plankFaceId: [5],
+                                            color: '#1852ff',
+                                            opacity: 0.6,
                                         },
                                     ],
                                 })}
                                 size="small"
                                 ghost
                             >
-                                突出多个板面
+                                突出所有板面
                             </Button>
                             <Button type="primary" onClick={this.hintClear} size="small" ghost>
                                 清空突出展示
                             </Button>
                         </section>
                     </Panel>
-                    <Panel header="模型刷新" key="model">
+                    <Panel header="选中-异形板件-高亮" key="model">
+                        <section className={style.btnContainer}>
+                            <Button
+                                type="primary"
+                                onClick={this.hintPlankModel()}
+                                size="small"
+                                ghost
+                            >
+                                高亮所有侧面
+                            </Button>
+                            <Button type="primary" onClick={this.hintPlankClear} size="small" ghost>
+                                清空所有高亮
+                            </Button>
+                        </section>
+                    </Panel>
+                    <Panel header="模型刷新" key="refresh">
                         <section className={style.btnContainer}>
                             <Button type="primary" onClick={this.refreshModel} size="small" ghost>
                                 刷新模型

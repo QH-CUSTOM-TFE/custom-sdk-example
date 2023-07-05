@@ -1550,15 +1550,15 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
-"@manycore/custom-miniapp-sdk@0.20.0-alpha.0":
-  version "0.20.0-alpha.0"
-  resolved "https://r.cnpmjs.org/@manycore/custom-miniapp-sdk/-/custom-miniapp-sdk-0.20.0-alpha.0.tgz#98dee67fd50c34fa8e4de801bbdfde2a87dfc748"
-  integrity sha512-3Z+pRMxn79YhsWvxg9DwB3PgGqnNnv8e6VZDiil5xdPjzJFNW1M7al+fxR1iir/oi7F2d4vGYislG6Jv4fpfag==
+"@manycore/custom-miniapp-sdk@0.20.10":
+  version "0.20.10"
+  resolved "https://r.cnpmjs.org/@manycore/custom-miniapp-sdk/-/custom-miniapp-sdk-0.20.10.tgz#f96a530ada360d7749673b7baf38bf4bf951cfab"
+  integrity sha512-1Dz89Ko7sJgIJLLWVUQWJzV09UERlbt3H9JXaE6GgR7VrpxuipBAuewapC4CGXKDgwm7Sy1lK9DT17Lr15sBRw==
 
-"@manycore/custom-sdk@1.13.4":
-  version "1.13.4"
-  resolved "https://r.cnpmjs.org/@manycore/custom-sdk/-/custom-sdk-1.13.4.tgz#4cefe13e2f2f24c41359f529ee8f3c2ce8a48cf4"
-  integrity sha512-81pKmSctD3kMt/jofaG2bFouurhc22kcMtNaWuiwmUA+ZwWRgmZGidO5BCxbCJHWoukcIfIBkFSDCihBtWzrzw==
+"@manycore/custom-sdk@1.13.11":
+  version "1.13.11"
+  resolved "https://r.cnpmjs.org/@manycore/custom-sdk/-/custom-sdk-1.13.11.tgz#c5c35f66c917a7cd07a773313646ad0279864e99"
+  integrity sha512-BYJLiTYTpUqEdfZf0iL1wMDEtDtpGsZOZCTIYFNomyy7Ag5I0+vVPgm6KXh0eZobA+NFwYle+9Hg3BRbWtr+Kw==
 
 "@manycore/idp-sdk@1.0.2":
   version "1.0.2"

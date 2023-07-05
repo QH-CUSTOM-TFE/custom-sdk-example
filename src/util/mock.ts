@@ -26,7 +26,18 @@ export const mockFittingDesignData = (options: {
                 {
                     id: holeId,
                     fittingType: EFittingType.HOLE,
-                    params: [],
+                    params: [
+                        {
+                            "key": "$$geometry_color", // Key固定
+                            "value": "#09e8a7", // 配置孔的颜色
+                            "type": "string"
+                        },
+                        {
+                            "key": "$$geometry_opacity", // Key固定
+                            "value": "0.5", // 配置孔的不透明度
+                            "type": "number"
+                        }
+                    ],
                     depth: 20,
                     diameter: 20,
                     plankFaceId: 0,
@@ -49,7 +60,18 @@ export const mockFittingDesignData = (options: {
                 {
                     id: grooveId,
                     fittingType: EFittingType.GROOVE,
-                    params: [],
+                    params: [
+                        {
+                            "key": "$$geometry_color", // Key固定
+                            "value": "#e75a5a", // 配置槽的颜色
+                            "type": "string"
+                        },
+                        {
+                            "key": "$$geometry_opacity", // Key固定
+                            "value": "0.5", // 配置槽的不透明度
+                            "type": "number"
+                        }
+                    ],
                     depth: 20,
                     width: 20,
                     plankFaceId: 0,
@@ -168,6 +190,18 @@ export const mockFittingDesignData = (options: {
                     plankFaceId: 0,
                     depth: 20,
                     fittingType: EFittingType.HARDWARE_GROOVE,
+                    params: [
+                        {
+                            "key": "$$geometry_color", // Key固定
+                            "value": "#e7c04d", // 配置五金槽的颜色
+                            "type": "string"
+                        },
+                        {
+                            "key": "$$geometry_opacity", // Key固定
+                            "value": "0.5", // 配置五金槽的不透明度
+                            "type": "number"
+                        }
+                    ],
                     points: [
                         {
                             position: {

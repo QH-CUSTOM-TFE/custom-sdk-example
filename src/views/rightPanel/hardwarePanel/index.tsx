@@ -1,14 +1,12 @@
-import Divider from 'antd/es/divider';
-import Icon from 'antd/es/icon';
-import Input from 'antd/es/input';
-import Tooltip from 'antd/es/tooltip';
-import React, { PureComponent, Fragment } from 'react';
-
+import React, { PureComponent } from 'react';
+import { Fragment } from 'react';
 import { connect } from 'react-redux';
-import { IRightPanelProps } from '../';
 import styles from '../index.module.scss';
-import GrooveBaseInfo from './groove';
+import { Input, Icon, Tooltip } from 'antd';
 import HoleBaseInfo from './hole';
+import GrooveBaseInfo from './groove';
+import { Divider } from 'antd';
+import { IRightPanelProps } from '../';
 
 export class HardwarePanel extends PureComponent<IRightPanelProps, never> {
     private onChange(value: string) {
@@ -179,9 +177,9 @@ export class HardwarePanel extends PureComponent<IRightPanelProps, never> {
                  * 虚拟模型 4
                  * 参数化组合模型 5
                  */}
-                {/* {model.modelTypeId === 2 && this.renderBaseProperty()}
+                {/*{model.modelTypeId === 2 && this.renderBaseProperty()}
                 {model.modelTypeId === 2 && this.renderPositionProperty()}
-                {model.modelTypeId === 2 && this.renderAngleProperty()} */}
+                {model.modelTypeId === 2 && this.renderAngleProperty()}*/}
                 <HoleBaseInfo />
                 <GrooveBaseInfo />
             </Fragment>

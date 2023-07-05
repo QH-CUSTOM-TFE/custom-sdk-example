@@ -1,35 +1,40 @@
-import { IExportModelData, IParamModelPhotoResponse } from '@manycore/custom-miniapp-sdk';
 import {
     ModelService,
     IntersectedService,
     FittingDesignService,
     IFittingDesignData,
+    IModelValidateResult,
+    ModelValidateService,
+    ModelHintService,
+    IHintPlank,
     IGetModelIntersectedOption,
-    IParamModelLite,
-    CustomModelService,
     EIntersectModelType,
     EProductDirection,
+    EIntersectedInfoType
 } from '@manycore/custom-sdk';
-import Avatar from 'antd/es/avatar';
-import Button from 'antd/es/button/button';
-import Checkbox from 'antd/es/checkbox';
-import Divider from 'antd/es/divider';
-import Icon from 'antd/es/icon';
-import Radio, { RadioChangeEvent } from 'antd/es/radio';
-import Paragraph from 'antd/es/typography/Paragraph';
-import { times } from 'lodash';
 import React, { PureComponent } from 'react';
-import { connect } from 'react-redux';
 import { getApplication } from '../../../core/app';
 import { actionUpdateSelected } from '../../../store/selection/action';
 import styles from '../index.module.scss';
+import Icon from 'antd/lib/icon';
+import Divider from 'antd/lib/divider';
+import Paragraph from 'antd/lib/typography/Paragraph';
+import Radio, { RadioChangeEvent } from 'antd/lib/radio';
+import Button from 'antd/lib/button/button';
+import { connect } from 'react-redux';
 import FittingDataWrap from './fittingDataWrap';
+import Checkbox from 'antd/lib/checkbox';
+import { times, fromPairs } from 'lodash';
+import { IExportModelData, IParamModelPhotoResponse } from '@manycore/custom-miniapp-sdk';
 import { ModelSwitchWrap } from './modelSwitchWrap';
-import { InputNumber, Select } from 'antd';
+import {Avatar, Input,InputNumber, Select} from 'antd';
 import { memoize } from 'lodash';
 
 export interface IBaseInfoState {
     json: string;
+    jsonData: IExportModelData[];
+    // 元件稳定信息
+    stableMap: Record<string, IModelValidateResult>;
     // 交接面信息
     intersected: string;
     /**
@@ -46,14 +51,12 @@ export interface IBaseInfoState {
      * 当前选中模型缩略图
      */
     modelImgData: IParamModelPhotoResponse[];
+    // 交接面/体阈值
+    threshold: string;
     /**
     * 交接面基础配置
     */
     intersectedBaseConfig: Omit<IGetModelIntersectedOption, 'modelId'>;
-    /**
-     * 模型数据
-     */
-    modelData?: IParamModelLite;
 }
 
 export interface IBaseInfoProps {
@@ -67,19 +70,21 @@ const availableOptions = times(7, (i) => {
         value: i,
     };
 });
-const fullFilled: number[] = times(7);
+const fullFilled: Array<number> = times(7);
 
 export class BaseInfo extends PureComponent<IBaseInfoProps, IBaseInfoState> {
-    state: IBaseInfoState= {
+    state: IBaseInfoState = {
         json: '',
+        jsonData: [],
         intersected: '',
         showIntersected: false,
         lastView: false,
         plankFaceIds: fullFilled,
         modelImgData: [],
+        stableMap: {},
+        threshold:'0.1',
         intersectedBaseConfig: {},
     };
-
 
     private requestIntersected = async (option: IGetModelIntersectedOption) => {
         const modelService = getApplication().getService(ModelService);
@@ -90,33 +95,47 @@ export class BaseInfo extends PureComponent<IBaseInfoProps, IBaseInfoState> {
     };
 
     private init = async (mId?: string) => {
-        if (mId) {
-            const customModelService = getApplication().getService(CustomModelService);
-            const model = await customModelService.getCustomModelById(mId);
-            this.setState({
-                modelData: model,
-            });
-        }
         const modelService = getApplication().getService(ModelService);
-        const json = await modelService.getParamData({ modelId: mId }).catch((e) => '');
-
+        const json = await modelService.getParamData({ modelId: mId }).catch((e) => {
+            return {
+                designData: []
+            }
+        });
+        await this.requestIntersected({ modelId: mId }).catch((e) => '');
+        const jsonData = json ? json.paramModel || [] : [];
         this.setState({
+            stableMap: {},
             json: json ? JSON.stringify(json) : '',
+            jsonData,
         });
 
         // 加载孔槽数据
         const fittingDesignService = getApplication().getService(FittingDesignService);
-        const fittingResult = await fittingDesignService.getConnectedFittingDesign(
-            undefined,
-            false
-        );
+        const fittingResult = await fittingDesignService.getFittingDesignData();
+
         const modelId = json.designData.paramModelIds;
         const modelImgData = await modelService.getParamModelPhotoById(modelId);
         this.setState({
-            modelImgData,
+            modelImgData: modelImgData,
         });
         if (fittingResult) {
             this.props.loadFittingDesignSuccess(fittingResult);
+        }
+
+        // 检测模型稳定
+        if (jsonData.length) {
+            const modelValidateService = getApplication().getService(ModelValidateService);
+            const result = (await Promise.all(
+                jsonData.map((it: IExportModelData) =>
+                    modelValidateService.stable({ modelId: it.id }).then((value) => {
+                        return [it.id, value];
+                    })
+                )
+            )) as Array<[string, IModelValidateResult]>;
+            const data = fromPairs(result) as Record<string, IModelValidateResult>;
+            this.setState({
+                stableMap: data,
+            });
         }
     };
 
@@ -144,8 +163,8 @@ export class BaseInfo extends PureComponent<IBaseInfoProps, IBaseInfoState> {
         event: React.MouseEvent<HTMLButtonElement, MouseEvent>
     ) => {
         const viewService = getApplication().getService(IntersectedService);
-        let { lastView, plankFaceIds } = this.state;
-        lastView = !lastView;
+        const { lastView, plankFaceIds } = this.state;
+
         viewService.toggleModelViewedIntersected({
             references: lastView,
             plankFaceIds: plankFaceIds.map((i) => {
@@ -156,7 +175,7 @@ export class BaseInfo extends PureComponent<IBaseInfoProps, IBaseInfoState> {
             }),
         });
         this.setState({
-            lastView,
+            lastView: !lastView,
         });
     };
 
@@ -181,21 +200,22 @@ export class BaseInfo extends PureComponent<IBaseInfoProps, IBaseInfoState> {
      * 模型基础数据渲染
      */
     protected renderModelBaseInfo() {
-        const { json, modelImgData } = this.state;
-        if (!json) {
+        const { jsonData, modelImgData, stableMap } = this.state;
+        if (!jsonData.length) {
             return null;
         }
-        const models = JSON.parse(json).paramModel ?? [];
-        if (!models.length) {
-            return null;
-        }
-        return models.map((m: IExportModelData) => {
+        return jsonData.map((m: IExportModelData) => {
             const {
                 modelName,
                 id,
                 size: { x, y, z },
                 textureName,
             } = m;
+            const stable = stableMap[id];
+            let stableText = '--';
+            if (stable) {
+                stableText = `共${stable.total}个元件，有${stable.invalidateTotal}个元件ID不稳定;`;
+            }
             return (
                 <>
                     <div className={styles.descItem}>
@@ -231,6 +251,18 @@ export class BaseInfo extends PureComponent<IBaseInfoProps, IBaseInfoState> {
                             src={this.getImgDataById(modelImgData, id)}
                         />
                     </div>
+                    <div className={styles.descItem}>
+                        <span>元件稳定</span>
+                        <span>{stableText}</span>
+                    </div>
+                    <div>
+                        <Button type="primary" size="small" style={{marginRight: '10px'}} onClick={ () => {this.hintUnStablePlank(id)}}>
+                            高亮不稳定ID面
+                        </Button>
+                        <Button type="primary" size="small" ghost onClick={ () => {this.clearHintUnStablePlank()}}>
+                            清除高亮
+                        </Button>
+                    </div>
                     <Divider />
                 </>
             );
@@ -263,6 +295,41 @@ export class BaseInfo extends PureComponent<IBaseInfoProps, IBaseInfoState> {
     };
 
     /**
+     * 如果元件不稳定，点击可以高亮不稳定的元件ID
+     * @param id
+     */
+    public hintUnStablePlank(id: string) {
+        console.log('start hint',id);
+        const state = this.state.stableMap[id];
+        if (state && state.invalidateList.length) {
+            const hintService = getApplication().getService(ModelHintService);
+            const result = state.invalidateList.map((modelId) => {
+                return [
+                    modelId,
+                    {
+                        hintPlankFace: [
+                            {
+                                plankFaceId: Array.from({ length: 6 }).map((i, index) => index),
+                                color: '#ffd400',
+                                opacity: 0.3,
+                            },
+                        ],
+                    },
+                ] as [string, IHintPlank];
+            });
+            console.log('result',result);
+            hintService.setModelHint(fromPairs(result));
+        }
+    }
+    /**
+     * 清空不稳定ID对应的板件高亮
+     */
+    public clearHintUnStablePlank() {
+            const hintService = getApplication().getService(ModelHintService);
+            hintService.clearModelHint();
+    }
+
+    /**
      * 获取指定模型的缩略图
      * @param modelImgData
      * @param id
@@ -276,6 +343,12 @@ export class BaseInfo extends PureComponent<IBaseInfoProps, IBaseInfoState> {
             return (modelData as IParamModelPhotoResponse).imgData;
         }
         return;
+    };
+
+    handleThresholdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        this.setState({
+            threshold: e.target.value,
+        });
     };
 
     private mergeIntersectedConfigState = (
@@ -294,20 +367,22 @@ export class BaseInfo extends PureComponent<IBaseInfoProps, IBaseInfoState> {
 
     memGetFlattenModelList = memoize(this.getFlattenModelList);
 
-    private getFlattenModelList(model: IParamModelLite) {
-        const list: IParamModelLite[] = [];
-        const modelQueue = [model];
+    private getFlattenModelList(models: IExportModelData[]) {
+        const list: IExportModelData[] = [];
+        const modelQueue = [...models];
         while (modelQueue.length) {
             const currentModel = modelQueue.shift()!;
             list.push(currentModel);
-            modelQueue.push(...currentModel.getChild(), ...currentModel.getAccessory());
+            if (currentModel.subModels && currentModel.subModels.length) {
+                modelQueue.push(...currentModel.subModels);
+            }
         }
         return list;
     }
 
-    private getUniqueCategoryList(model: IParamModelLite) {
-        const modelList = this.memGetFlattenModelList(model);
-        return Array.from(new Set(modelList.filter((m) => true).map((m) => m.category)));
+    private getUniqueCategoryList(models: IExportModelData[]) {
+        const modelList = this.memGetFlattenModelList(models);
+        return [...new Set(modelList.map((m) => m.prodCatId).filter((cat) => !!cat))];
     }
 
     private getButtonType = (modelType: EIntersectModelType) => {
@@ -341,15 +416,22 @@ export class BaseInfo extends PureComponent<IBaseInfoProps, IBaseInfoState> {
         this.mergeIntersectedConfigState({ direction: newDirection });
     };
 
+
+    private onInfoTypeChange = (checkedValues: EIntersectedInfoType[]) => {
+        this.mergeIntersectedConfigState({ intersectedInfoType: checkedValues });
+    };
+
     private renderIntersectConfig = () => {
         const {
-            modelData,
+            jsonData,
             intersectedBaseConfig: {
                 faceDistTol,
                 bodyDistTol,
                 thicknessFilter,
                 products = [],
                 direction,
+                tolerance,
+                intersectedInfoType = [EIntersectedInfoType.SHELL],
             },
         } = this.state;
         const style = { marginBottom: '5px' };
@@ -412,8 +494,8 @@ export class BaseInfo extends PureComponent<IBaseInfoProps, IBaseInfoState> {
                             })
                         }
                     >
-                        {modelData &&
-                            this.getUniqueCategoryList(modelData).map((category) => (
+                        {jsonData &&
+                            this.getUniqueCategoryList(jsonData).map((category) => (
                                 <Select.Option key={category} value={category}>
                                     {category}
                                 </Select.Option>
@@ -464,6 +546,7 @@ export class BaseInfo extends PureComponent<IBaseInfoProps, IBaseInfoState> {
                 </div>
 
                 <div style={{ fontWeight: 'bold', ...style }}>判断逻辑配置</div>
+                <div style={{ fontWeight: 'bold', ...style }}>交接面</div>
                 <div style={style}>
                     不足板厚的交接面是否输出
                     <Radio.Group
@@ -475,6 +558,14 @@ export class BaseInfo extends PureComponent<IBaseInfoProps, IBaseInfoState> {
                         <Radio value={true}>否</Radio>
                         <Radio value={false}>是</Radio>
                     </Radio.Group>
+                </div>
+                <div style={{ fontWeight: 'bold', ...style }}>交接体</div>
+                <div style={style}>
+                    交接体输出类型
+                    <Checkbox.Group value={intersectedInfoType} onChange={this.onInfoTypeChange as any}>
+                        <Checkbox value={EIntersectedInfoType.SHELL}>交接体</Checkbox>
+                        <Checkbox value={EIntersectedInfoType.THROUGH_SHELL}>贯穿交接体</Checkbox>
+                    </Checkbox.Group>
                 </div>
                 <div style={{ fontWeight: 'bold', ...style }}>计算阈值配置</div>
                 <div style={style}>
@@ -503,13 +594,25 @@ export class BaseInfo extends PureComponent<IBaseInfoProps, IBaseInfoState> {
                         }
                     />
                 </div>
+                <div style={style}>
+                    通用阈值(废弃):
+                    <InputNumber
+                        size="small"
+                        placeholder="0.1mm"
+                        step={0.1}
+                        min={0}
+                        value={tolerance}
+                        onChange={(e) =>
+                            this.mergeIntersectedConfigState({ tolerance: e ? e : undefined })
+                        }
+                    />
+                </div>
                 <Button
                     type="primary"
                     size="small"
                     onClick={() =>
                         this.requestIntersected({
-                            ...this.state.intersectedBaseConfig,
-                            modelId: modelData?.id,
+                            ...this.state.intersectedBaseConfig
                         })
                     }
                 >
@@ -552,6 +655,23 @@ export class BaseInfo extends PureComponent<IBaseInfoProps, IBaseInfoState> {
                     >
                         复制交接面信息
                     </Paragraph>
+                    交接面阈值(mm):
+                    <Input
+                        style={{ width: '25%', marginLeft: '5px' }}
+                        placeholder="0.1mm"
+                        value={ this.state.threshold }
+                        onChange={(e) => this.handleThresholdChange(e)}
+                    />
+                    <Button
+                        type="primary"
+                        onClick={() => this.handelModelChange}
+                        size="small"
+                        style={{marginLeft: '10px'}}
+                    >
+                        保存
+                    </Button>
+                    <div>注意：保存后需要”切换渲染模型“生效</div>
+                    <Divider></Divider>
                     <Paragraph
                         disabled={!!fittingDesign}
                         copyable={fittingDesign ? { text: fittingDesign } : false}
@@ -559,7 +679,6 @@ export class BaseInfo extends PureComponent<IBaseInfoProps, IBaseInfoState> {
                         复制孔槽方案数据
                     </Paragraph>
                 </div>
-                <Divider />
                 <FittingDataWrap />
             </div>
         );
