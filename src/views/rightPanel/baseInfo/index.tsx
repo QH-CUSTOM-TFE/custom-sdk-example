@@ -2,13 +2,7 @@ import {
     ModelService,
     IntersectedService,
     FittingDesignService,
-    IFittingDesignData,
-    IModelValidateResult,
-    ModelValidateService,
-    ModelHintService,
-    IHintPlank,
-    IGetModelIntersectedOption,
-    EIntersectModelType,
+    IFittingDesignData, IModelValidateResult, ModelValidateService, ModelHintService, IHintPlank,IGetModelIntersectedOption,EIntersectModelType,
     EProductDirection,
     EIntersectedInfoType
 } from '@manycore/custom-sdk';
@@ -416,7 +410,7 @@ export class BaseInfo extends PureComponent<IBaseInfoProps, IBaseInfoState> {
         this.mergeIntersectedConfigState({ direction: newDirection });
     };
 
-
+    
     private onInfoTypeChange = (checkedValues: EIntersectedInfoType[]) => {
         this.mergeIntersectedConfigState({ intersectedInfoType: checkedValues });
     };
