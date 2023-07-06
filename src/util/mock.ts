@@ -1,4 +1,4 @@
-import { EFittingType, IFittingDesignData, ELineType, EPointType } from '@manycore/custom-sdk';
+import { EFittingType, ELineType, EPointType, IFittingDesignData } from '@manycore/custom-sdk';
 import { random } from 'lodash';
 
 // 3FO4GB757RQ1 内网

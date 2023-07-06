@@ -10,7 +10,7 @@ import styles from '../index.module.scss';
 const { TabPane } = Tabs;
 
 export interface IHoleBaseInfoProps {
-    selectedFittingDesign?: IFittingDesignData;
+    selectedFittingDesign: IFittingDesignData;
 }
 
 export class HoleBaseInfo extends PureComponent<IHoleBaseInfoProps> {
@@ -65,7 +65,7 @@ export class HoleBaseInfo extends PureComponent<IHoleBaseInfoProps> {
                     <span>关联孔信息</span>
                 </div>
                 <Tabs defaultActiveKey="1" size="small" style={{ height: 200 }}>
-                    {map(selectedFittingDesign!.holes, (value, id) => (
+                    {map(selectedFittingDesign.holes, (value, id) => (
                         <TabPane tab={`孔`} key={id}>
                             {this.renderHoleInfo(value, id)}
                         </TabPane>

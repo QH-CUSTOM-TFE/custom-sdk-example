@@ -1,6 +1,6 @@
 import { FittingDesignService, IFittingDesignData } from '@manycore/custom-sdk';
 import message from 'antd/es/message';
-import { PureComponent } from 'react';
+import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { getApplication } from '../../../core/app';
 import { FittingData } from '../fittingData';

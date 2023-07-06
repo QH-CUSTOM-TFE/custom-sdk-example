@@ -7,7 +7,7 @@ import {
 } from '@manycore/custom-sdk';
 import Select from 'antd/es/select';
 import Switch from 'antd/es/switch';
-import { Fragment, useState } from 'react';
+import React, { Fragment, useCallback, useState } from 'react';
 
 import { designModes, RenderModes, sceneCameraMode } from '../../constant';
 import { getApplication } from '../../core/app';
@@ -23,41 +23,52 @@ const { Option } = Select;
 export function Footer() {
     const [isShowMoveControl, setIsShowMoveControl] = useState(false);
 
-    const handleCameraModeChange = (mode: ECameraMode) => {
+    const handleCameraModeChange = useCallback((mode: ECameraMode) => {
         cameraService.toggleCameraMode(mode);
-    };
+    }, []);
 
-    const changeDesignMode = (mode: EDesignMode) => {
+    const changeDesignMode = useCallback((mode: EDesignMode) => {
         sceneService.setDesignMode({ mode });
-    };
+    }, []);
+
+    const resetPerspective = useCallback(() => {
+        viewerService.resetPerspective();
+    }, []);
+
     return (
         <Fragment>
             <div>
-                <button
-                    className={style.viewerBtn}
-                    onClick={() => viewerService.resetPerspective()}
-                >
+                <button className={style.viewerBtn} onClick={resetPerspective}>
                     重置视角
                 </button>
                 <Select defaultValue={sceneCameraMode[0].mode} onChange={handleCameraModeChange}>
-                    {sceneCameraMode.map((cm) => {
-                        return <Option value={cm.mode}>{cm.text}</Option>;
+                    {sceneCameraMode.map((cm, index) => {
+                        return (
+                            <Option value={cm.mode} key={index}>
+                                {cm.text}
+                            </Option>
+                        );
                     })}
                 </Select>
                 <span>
                     <Switch
                         checkedChildren="开启控件"
                         unCheckedChildren="关闭控件"
-                        onChange={(checked: boolean) => setIsShowMoveControl(checked)}
+                        onChange={setIsShowMoveControl}
                     />
                 </span>
-                {RenderModes.map((mode) => {
+                {RenderModes.map((mode, index) => {
                     return (
                         <button
+                            key={index}
                             className={style.viewerBtn}
                             onClick={() => {
-                                viewerService.toggleModelBorder(mode.isSetBorder);
-                                viewerService.toggleModelTransparent(mode.isSetTransparent);
+                                /*if (mode.isFullTransparent) {
+                                    viewerService.toggleModelFullTransparent(true);
+                                } else {*/
+                                    viewerService.toggleModelBorder(mode.isSetBorder!);
+                                    viewerService.toggleModelTransparent(mode.isSetTransparent!);
+                                // }
                             }}
                         >
                             {mode.text}
@@ -65,8 +76,12 @@ export function Footer() {
                     );
                 })}
                 <Select defaultValue={designModes[2].mode} onChange={changeDesignMode}>
-                    {designModes.map((d) => {
-                        return <Option value={d.mode}>{d.text}</Option>;
+                    {designModes.map((d, key) => {
+                        return (
+                            <Option value={d.mode} key={key}>
+                                {d.text}
+                            </Option>
+                        );
                     })}
                 </Select>
             </div>

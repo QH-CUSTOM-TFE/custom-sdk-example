@@ -6,10 +6,10 @@ import {
     ISelected,
     ModelCameraService,
     ModelViewerSelectionService,
+    ModelViewerSelectionV2Service,
 } from '@manycore/custom-sdk';
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
-
 import { AppLayout } from '../../components/AppLayout';
 import { getApplication } from '../../core/app';
 import { actionUpdateSelected } from '../../store/selection/action';
@@ -27,6 +27,7 @@ export interface IMainProps {
 export function Main(props: IMainProps) {
     useEffect(() => {
         const selectService = getApplication().getService(ModelViewerSelectionService);
+        const selectServicev2 = getApplication().getService(ModelViewerSelectionV2Service);
         const fittingDesignService = getApplication().getService(FittingDesignService);
         const watchSelectedModelChange = async (selected: ISelected) => {
             if (selected.type === ESelectedType.MODEL) {
@@ -44,6 +45,9 @@ export function Main(props: IMainProps) {
         };
         // 当选择某块板件时，触发
         selectService.on(watchSelectedModelChange);
+        selectServicev2.on((model) => {
+            console.log('eder model selected', model);
+        });
 
         const currentSelected = selectService.getSelected();
         watchSelectedModelChange(currentSelected);
@@ -56,7 +60,7 @@ export function Main(props: IMainProps) {
     /** 注册快捷键 */
     useEffect(() => {
         document.onkeydown = function (e: KeyboardEvent) {
-            let arrow: ECameraMoveDirection | undefined = undefined;
+            let arrow: ECameraMoveDirection = undefined!;
             switch (e.key) {
                 case 'w':
                     arrow = ECameraMoveDirection.FRONT;

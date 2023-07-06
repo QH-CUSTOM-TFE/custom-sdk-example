@@ -1,12 +1,3 @@
-import { IParamModelPhotoResponse } from '@manycore/custom-miniapp-sdk';
-import {
-    FittingDesignService,
-    IFittingDesignData,
-    ITopParamModelDataResponse,
-    ITopParamModelList,
-    ModelService,
-    ModelViewerService,
-} from '@manycore/custom-sdk';
 import Avatar from 'antd/es/avatar';
 import Button from 'antd/es/button';
 import Divider from 'antd/es/divider';
@@ -16,6 +7,16 @@ import Select from 'antd/es/select';
 import Paragraph from 'antd/es/typography/Paragraph';
 import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
+
+import { IParamModelPhotoResponse } from '@manycore/custom-miniapp-sdk';
+import {
+    FittingDesignService,
+    IFittingDesignData,
+    ITopParamModelDataResponse,
+    ITopParamModelList,
+    ModelService,
+    ModelViewerService,
+} from '@manycore/custom-sdk';
 
 import { getApplication } from '../../../core/app';
 import { getSubModels, mockFittingDesignData } from '../../../util';
