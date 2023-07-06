@@ -11,8 +11,9 @@ import {
     EElementType,
     FittingHintService,
     IHintBase,
-    IHintFitting,
+    IHintFitting, IPlankArea,
     ModelViewerSelectionV2Service,
+    PlankPathService,
 } from '@manycore/custom-sdk';
 import Button from 'antd/es/button';
 import Collapse from 'antd/es/collapse';
@@ -38,6 +39,20 @@ const MODEL_TYPE_OPTION = [
         label: '五金',
         value: ESetSelectType.CASBIN,
     },
+];
+
+let displayPlankAreaCash: IPlankArea | undefined = undefined; // 存储实际展示的轮廓数据，用于高亮一键清除
+const colors = [
+    '#ff0000',
+    '#ff8400',
+    '#fff200',
+    '#2ba801',
+    '#00ffa6',
+    '#00ffff',
+    '#0053ff',
+    '#5900ff',
+    '#bc00ff',
+    '#ff0084',
 ];
 
 interface IState {
@@ -149,7 +164,7 @@ export class BasicFunction extends PureComponent<{}, IState> {
                 });
             }
         };
-    };*/
+    };
 
     /*private cancelFittingHardwareHint = () => {
         const fittingHintService = getApplication().getService(FittingHintService);
@@ -207,6 +222,90 @@ export class BasicFunction extends PureComponent<{}, IState> {
             mask: false,
             content: <section>{result ? JSON.stringify(result) : result + ''}</section>,
         });
+    };
+    /**
+     * 获取json数据中的板件id、轮廓数据
+     */
+    private getPlankDataFromJson = (jsonData: any) => {
+        // 板件是模型树的最后一级 没有children，所以需要不断的往下找subModels，直到当前层级没有subModels这个字段
+        let plankModelData = jsonData;
+        while (plankModelData.subModels) {
+            plankModelData = plankModelData.subModels[0];
+        }
+        // console.log('plankModel.paramPlankPath',plankModelData.paramPlankPath);
+        return {
+            modelId: plankModelData.id,
+            plankPathData: {
+                path: plankModelData.paramPlankPath.path,
+                holes: plankModelData.paramPlankPath.holes,
+            },
+        };
+    };
+
+    /**
+     * 异形板件标识
+     */
+    private hintPlankModel = () => {
+        const selectionService = getApplication().getService(ModelViewerSelectionService);
+        const plankPathService = getApplication().getService(PlankPathService);
+        return async () => {
+            this.hintPlankClear(); // 清除上一次高亮，否则颜色会不断叠加
+            const selected = selectionService.getSelected();
+            if (selected && selected.type === ESelectedType.MODEL) {
+                // #1.获取鼠标选中模型的json数据，取出轮廓数据和板件ID
+                const jsonData = selected.data[0];
+                const { modelId, plankPathData } = this.getPlankDataFromJson(jsonData);
+                // #2.解析轮廓原始数据
+                // modelID传顶层模型or其他非底层模型的id，最后都没有高亮效果
+                const plankArea = plankPathService.parseModelPlankPath({
+                    modelID: modelId,
+                    data: plankPathData,
+                });
+                // #3.对轮廓原始数据进行计算，生成实际展示的轮廓数据 (原始数据中可能存在板件外轮廓和挖洞重合、挖洞与挖洞重合、非直角端点等情况)
+                const displayPlankArea = plankArea.getRealPaths(); // @param force? 忽略缓存
+                displayPlankAreaCash = displayPlankArea; // 记录当前高亮的数据，用于高亮清除
+                console.log('plankArea.getRealPaths()', displayPlankArea);
+                // #4.为轮廓下的所有点、线添加高亮配置
+                displayPlankArea.paths.forEach((d) => {
+                    // if (d.type === EPlankPathType.INNER) {  // 加了这个约束，可以实现仅高亮内部or外部洞
+                    d.points.forEach((p, index) => {
+                        p.setHint({
+                            color: '#d5d5d5',
+                            opacity: 1.0,
+                        });
+                    });
+                    d.lines.forEach((l, index) => {
+                        l.setHint({
+                            color: colors[index % 10],
+                            opacity: 1.0,
+                        });
+                    });
+                    // }
+                });
+                // #5.将修改后的轮廓数据保存到渲染场景中
+                plankPathService.syncModelPlankPath(displayPlankArea);
+            }
+        };
+    };
+
+    /**
+     * 清空异形板面高亮
+     */
+    private hintPlankClear = () => {
+        const plankPathService = getApplication().getService(PlankPathService);
+        if (displayPlankAreaCash && displayPlankAreaCash.paths) {
+            displayPlankAreaCash.paths.forEach((d) => {
+                d.points.forEach((p) => {
+                    p.clearHint();
+                });
+                d.lines.forEach((l) => {
+                    l.clearHint();
+                });
+            });
+            // 将修改后的轮廓数据保存到渲染场景中
+            plankPathService.syncModelPlankPath(displayPlankAreaCash);
+        }
+        displayPlankAreaCash = undefined;
     };
 
     refreshModel = () => {
@@ -372,6 +471,21 @@ export class BasicFunction extends PureComponent<{}, IState> {
                                 ghost
                             >
                                 高亮当前选中孔槽
+                            </Button>
+                        </section>
+                    </Panel>
+                    <Panel header="选中-异形板件-高亮" key="model">
+                        <section className={style.btnContainer}>
+                            <Button
+                                type="primary"
+                                onClick={this.hintPlankModel()}
+                                size="small"
+                                ghost
+                            >
+                                高亮所有侧面
+                            </Button>
+                            <Button type="primary" onClick={this.hintPlankClear} size="small" ghost>
+                                清空所有高亮
                             </Button>
                         </section>
                     </Panel>
