@@ -3,7 +3,12 @@ import { ECameraMode, EDesignMode } from '@manycore/custom-sdk';
 /**
  * 模型渲染模式
  */
-export const RenderModes = [
+export const RenderModes: Array<{
+    text: string;
+    isSetBorder?: boolean;
+    isSetTransparent?: boolean;
+    isFullTransparent?: boolean;
+}> = [
     {
         text: '材质',
         isSetBorder: false,
@@ -23,7 +28,11 @@ export const RenderModes = [
         text: '线框+半透明',
         isSetBorder: true,
         isSetTransparent: true,
-    },
+    }/*,
+    {
+        text: '透明',
+        isFullTransparent: true,
+    },*/
 ];
 
 export const sceneCameraMode = [

@@ -1,4 +1,5 @@
 .rightPanelContainer {
+    /* stylelint-disable */
     width: 100%;
     height: 100%;
     overflow: auto;
@@ -47,7 +48,7 @@
     :global(.ant-divider) {
         font-size: 12px;
     }
-    
+
     .imgContainer {
         position: relative;
 

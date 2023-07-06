@@ -1,9 +1,9 @@
 import { FittingDesignService, IFittingDesignData } from '@manycore/custom-sdk';
-import { PureComponent } from 'react';
+import message from 'antd/es/message';
+import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { getApplication } from '../../../core/app';
 import { FittingData } from '../fittingData';
-import { message } from 'antd';
 
 const text = '保存';
 export interface IFittingDataWrapProps {

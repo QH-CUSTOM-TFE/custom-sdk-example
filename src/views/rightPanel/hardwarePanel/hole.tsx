@@ -1,17 +1,16 @@
 import { IFittingDesignData, IHoleData } from '@manycore/custom-sdk';
-import React, { PureComponent } from 'react';
-import { Fragment } from 'react';
+import Divider from 'antd/es/divider';
+import Icon from 'antd/es/icon';
+import Tabs from 'antd/es/tabs';
+import { map } from 'lodash';
+import React, { PureComponent, Fragment } from 'react';
 import { connect } from 'react-redux';
 import styles from '../index.module.scss';
-import { Icon } from 'antd';
-import { Divider } from 'antd';
-import { Tabs } from 'antd';
-import { map } from 'lodash';
 
 const { TabPane } = Tabs;
 
 export interface IHoleBaseInfoProps {
-    selectedFittingDesign?: IFittingDesignData;
+    selectedFittingDesign: IFittingDesignData;
 }
 
 export class HoleBaseInfo extends PureComponent<IHoleBaseInfoProps> {
@@ -66,7 +65,7 @@ export class HoleBaseInfo extends PureComponent<IHoleBaseInfoProps> {
                     <span>关联孔信息</span>
                 </div>
                 <Tabs defaultActiveKey="1" size="small" style={{ height: 200 }}>
-                    {map(selectedFittingDesign!.holes, (value, id) => (
+                    {map(selectedFittingDesign.holes, (value, id) => (
                         <TabPane tab={`孔`} key={id}>
                             {this.renderHoleInfo(value, id)}
                         </TabPane>

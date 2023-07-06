@@ -1,6 +1,8 @@
-import { Button, Input, message } from 'antd';
-import Paragraph from 'antd/lib/typography/Paragraph';
-import React, { useEffect, useState } from 'react';
+import Button from 'antd/es/button';
+import Input from 'antd/es/input';
+import message from 'antd/es/message';
+import Paragraph from 'antd/es/typography/Paragraph';
+import React, { memo, useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 
 import { CustomModelService, FittingModelService } from '@manycore/custom-sdk';
@@ -25,10 +27,9 @@ function getAllModels() {
 
     return data;
 }
-
-const HideControl = React.memo(function () {
-    const [modelID, setModelId] = React.useState('');
-    const [fittingID, setFittingID] = React.useState('');
+const HideControl = memo(function HideControl() {
+    const [modelID, setModelId] = useState('');
+    const [fittingID, setFittingID] = useState('');
     const allModels = getAllModels();
     const getModelByID = () => {
         if (!modelID) {
@@ -69,7 +70,7 @@ const HideControl = React.memo(function () {
         fittings.forEach((f) => {
             f.setHidden(!f.getHidden());
         });
-        fittingModelService.save({
+        await fittingModelService.save({
             models: fittings,
         });
     };
@@ -87,7 +88,7 @@ const HideControl = React.memo(function () {
         currentFittings.forEach((f) => {
             f.setHidden(!f.getHidden());
         });
-        fittingModelService.save({
+        await fittingModelService.save({
             models: currentFittings,
         });
     };
